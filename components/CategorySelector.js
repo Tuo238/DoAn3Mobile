@@ -16,7 +16,7 @@ export default function CategorySelector({ navigation }) {
       <Pressable
         style={{ alignItems: "flex-end", marginRight: 20, marginTop: 5 }}
       >
-        <Ionicons name={"search"} size={30} />
+        <Ionicons name={"search"} color={"red"} size={30} />
       </Pressable>
       <Text style={styles.text}>Explore</Text>
       {/* <Button
