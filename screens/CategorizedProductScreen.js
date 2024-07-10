@@ -7,15 +7,20 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import CategorySelector from "../components/CategorySelector";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  where,
+  query,
+} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
 
-export default function HomeScreen({ navigation }) {
+export default function CategorizedProduct({ navigation, route }) {
+  const { category } = route.params;
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
@@ -26,18 +31,21 @@ export default function HomeScreen({ navigation }) {
 
   const getProductList = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "products"));
+      const q = query(
+        collection(db, "products"),
+        where("category", "==", category)
+      );
+      const querySnapshot = await getDocs(q);
+
       const productsList = await Promise.all(
         querySnapshot.docs.map(async (doc) => {
           const data = doc.data();
-          // console.log(`Product: ${data.name}, Image paths: ${data.images}`); // Debug log
 
           const imageUrls = await Promise.all(
             (data.image || []).map(async (imagePath) => {
               try {
                 const storageRef = ref(storage, imagePath);
                 const url = await getDownloadURL(storageRef);
-                // console.log(`Fetched URL: ${url}`); // Debug log
                 return url;
               } catch (error) {
                 console.error(`Error fetching URL for ${imagePath}:`, error);
@@ -46,11 +54,10 @@ export default function HomeScreen({ navigation }) {
             })
           );
 
-          // console.log(`Product: ${data.name}, Image URLs: ${imageUrls}`); // Debug log
           return {
             id: doc.id,
             ...data,
-            imageUrls: imageUrls.filter((url) => url !== null), // Filter out null URLs
+            imageUrls: imageUrls.filter((url) => url !== null),
           };
         })
       );
@@ -99,7 +106,6 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.BC}>
       <View style={styles.container}>
-        <CategorySelector style={styles.category} navigation={navigation} />
         <FlatList
           data={products}
           renderItem={renderItem}
@@ -144,7 +150,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     // margin: 10,
     width: 170,
-    borderRadius: 10,
   },
   innerItem: {
     marginLeft: 0,

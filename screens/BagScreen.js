@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from "react-native";
 export default function LikeScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Like Screen</Text>
+      <Text style={styles.text}>Cart Screen</Text>
     </View>
   );
 }

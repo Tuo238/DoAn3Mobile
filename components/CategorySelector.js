@@ -6,12 +6,13 @@ import {
   Pressable,
   StatusBar,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function CategorySelector({ navigation }) {
   return (
-    <View>
+    <View style={styles.container}>
       <Pressable
         style={{ alignItems: "flex-end", marginRight: 20, marginTop: 5 }}
       >
@@ -23,40 +24,65 @@ export default function CategorySelector({ navigation }) {
         onPress={() => navigation.navigate("TestStack")}
       /> */}
       <ScrollView horizontal>
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() =>
+            navigation.navigate("CategorizedProduct", { category: "Sofa" })
+          }
+        >
           <View style={styles.icon}>
             <Ionicons name={"bed"} size={50} />
           </View>
           <Text style={styles.miniText}>Sofa</Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() =>
+            navigation.navigate("CategorizedProduct", { category: "Table" })
+          }
+        >
           <View style={styles.icon}>
             <Ionicons name={"bed"} size={50} />
           </View>
-          <Text style={styles.miniText}>Sofa</Text>
-        </View>
+          <Text style={styles.miniText}>Table</Text>
+        </TouchableOpacity>
 
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() =>
+            navigation.navigate("CategorizedProduct", { category: "Chair" })
+          }
+        >
           <View style={styles.icon}>
             <Ionicons name={"bed"} size={50} />
           </View>
-          <Text style={styles.miniText}>Sofa</Text>
-        </View>
+          <Text style={styles.miniText}>Chair</Text>
+        </TouchableOpacity>
 
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() =>
+            navigation.navigate("CategorizedProduct", { category: "Lamp" })
+          }
+        >
           <View style={styles.icon}>
             <Ionicons name={"bed"} size={50} />
           </View>
-          <Text style={styles.miniText}>Sofa</Text>
-        </View>
+          <Text style={styles.miniText}>Lamp</Text>
+        </TouchableOpacity>
 
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() =>
+            navigation.navigate("CategorizedProduct", { category: "Cabinet" })
+          }
+        >
           <View style={styles.icon}>
             <Ionicons name={"bed"} size={50} />
           </View>
-          <Text style={styles.miniText}>Sofa</Text>
-        </View>
+          <Text style={styles.miniText}>Cabinet</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -67,20 +93,21 @@ const styles = StyleSheet.create({
   //     flex: 1,
   //     backgroundColor: "#BAC3C3",
   //   },
-  //   container: {
-  //     marginTop: StatusBar.currentHeight,
-  //     paddingLeft: 20,
-  //     marginRight: 20,
-  //   },
+  container: {
+    // marginTop: StatusBar.currentHeight,
+    // paddingLeft: 20,
+  },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
     padding: 10,
+    marginLeft: 20,
   },
   itemContainer: {
     alignItems: "center",
     marginHorizontal: 10,
+    marginLeft: 20,
   },
   icon: {
     width: 80,

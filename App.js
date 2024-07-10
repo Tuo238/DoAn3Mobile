@@ -42,7 +42,7 @@ export default function App() {
           }}
         />
         <Tab.Screen
-          name="Bag"
+          name="Cart"
           component={BagScreen}
           options={{
             tabBarIcon: ({ color }) => (
