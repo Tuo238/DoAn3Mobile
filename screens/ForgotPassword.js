@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,15 +6,27 @@ import {
   StatusBar,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { app, auth, firestore } from "../src/firebase/Config";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState("");
 
+  const forgotPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Success", "Password reset email sent successfully!");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign in {email}</Text>
+      <Text style={styles.title}>Reset Password</Text>
       <View style={styles.InputContainer}>
         <TextInput
           placeholder="Email"
@@ -22,35 +34,12 @@ export default function ForgotPassword({ navigation }) {
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.InputStyle}
-          placeholder="Password"
-          autoCapitalize="none"
-          secureTextEntry
+          keyboardType="email-address"
         />
       </View>
-      <View style={styles.textContainer}>
-        <Text>Don't have an account ?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUpScreen")}>
-          <Text style={styles.boldText}> Create One</Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.textContainer}>
-        <Text>Forgot password ?</Text>
-        <TouchableOpacity>
-          <Text style={styles.boldText}> Reset Password</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.signinButton}>
-        <Text style={styles.signinText}>Sign in</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.googleButton}>
-        <Ionicons name={"logo-google"} size={27} color="white" />
-        <Text style={styles.googleText}>Sign in with Google</Text>
+      <TouchableOpacity style={styles.signinButton} onPress={forgotPassword}>
+        <Text style={styles.signinText}>Continue</Text>
       </TouchableOpacity>
     </View>
   );
@@ -58,7 +47,7 @@ export default function ForgotPassword({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Ensure the container takes up the full available height
+    flex: 1,
     marginTop: StatusBar.currentHeight,
     marginHorizontal: 20,
   },
@@ -84,15 +73,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 60,
   },
-  textContainer: {
-    flexDirection: "row",
-    marginLeft: 7,
-    padding: 5,
-    marginVertical: 5,
-  },
-  boldText: {
-    fontWeight: "bold",
-  },
   signinButton: {
     width: "100%",
     height: 50,
@@ -105,26 +85,6 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   signinText: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "white",
-  },
-  googleButton: {
-    width: "100%",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "green",
-    borderRadius: 15,
-    backgroundColor: "#BAC3C3",
-    marginVertical: 10,
-    padding: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  googleText: {
-    width: "90%",
-    textAlign: "right",
     fontSize: 15,
     fontWeight: "bold",
     color: "white",

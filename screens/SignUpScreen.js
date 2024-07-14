@@ -6,14 +6,19 @@ import {
   StatusBar,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/firebase/Config";
+import { doc, setDoc, getFirestore } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
+import { app, auth, firestore } from "../src/firebase/Config";
 
-export default function SignUpScreen({ navigation, route }) {
+export default function SignUpScreen({ navigation }) {
+  const db = getFirestore(app);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -21,42 +26,40 @@ export default function SignUpScreen({ navigation, route }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (email) => {
-    const re = /\S+@\S+\.\S+/;
-    return re.test(email);
-  };
-
-  const handleSignUp = () => {
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
-      return;
-    }
-
+  const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      alert("Passwords do not match.");
       return;
     }
 
     setIsLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up successfully
-        const user = userCredential.user;
-        console.log("User signed up:", user.uid);
-        setIsLoading(false);
-        // Navigate to another screen or perform other actions upon success
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        Alert.alert("Error", error.message);
-        console.error("Error signing up:", error);
+      // Send verification email
+      await sendEmailVerification(user);
+
+      // Save user data to Firestore with document ID as user UID
+      await setDoc(doc(db, "users", user.uid), {
+        firstName,
+        lastName,
+        email,
+        createdAt: new Date(),
       });
+
+      alert("Verification email sent. Please check your inbox.");
+      navigation.navigate("SignIn");
+    } catch (error) {
+      console.error("Error signing up:", error);
+      alert("Error signing up. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -103,7 +106,7 @@ export default function SignUpScreen({ navigation, route }) {
       <TouchableOpacity
         style={styles.signinButton}
         onPress={handleSignUp}
-        disabled={isLoading} // Disable button when loading
+        disabled={isLoading}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="white" />
@@ -112,7 +115,10 @@ export default function SignUpScreen({ navigation, route }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.googleButton}>
+      <TouchableOpacity
+        style={styles.googleButton}
+        onPress={navigation.navigate("SignIn")}
+      >
         <Ionicons name={"logo-google"} size={27} color="white" />
         <Text style={styles.googleText}>Continue with Google</Text>
       </TouchableOpacity>
