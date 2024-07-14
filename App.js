@@ -6,7 +6,7 @@ import HomeScreen from "./screens/HomeScreen";
 import LikeScreen from "./screens/LikeScreen";
 import BagScreen from "./screens/BagScreen";
 import ProfileScreen from "./screens/ProfileScreen";
-import SignInScreen from "./screens/SignInScreen"; // Import the SignInScreen
+import SignInScreen from "./screens/SignInScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPassword from "./screens/ForgotPassword";
 
@@ -59,6 +59,7 @@ function TabNavigator() {
           tabBarIcon: ({ color }) => (
             <Ionicons name={"person"} size={20} color={color} />
           ),
+          headerShown: false,
         }}
       />
     </Tab.Navigator>
@@ -68,7 +69,7 @@ function TabNavigator() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignUpScreen">
+      <Stack.Navigator initialRouteName="Main">
         <Stack.Screen
           name="SignIn"
           component={SignInScreen}
@@ -84,7 +85,6 @@ export default function App() {
           component={ForgotPassword}
           options={{ headerShown: false }}
         />
-
         <Stack.Screen
           name="Main"
           component={TabNavigator}
