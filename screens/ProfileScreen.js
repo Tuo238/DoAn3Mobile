@@ -24,25 +24,25 @@ export default function ProfileScreen({ navigation, route }) {
         {/* Nút View personal information */}
         <TouchableOpacity style={styles.gridItem}>
           <Image source={require('../assets/view_person_information.png')} style={styles.icon} />
-          <Text style={styles.itemText}>VIEW PERSON information</Text>
+          <Text style={styles.itemText}>View personal information</Text>
         </TouchableOpacity>
 
-        {/* Nút View personal information */}
+        {/* Nút View Order Management */}
         <TouchableOpacity style={styles.gridItem}>
-          <Image source={require('../assets/view_person_information.png')} style={styles.icon}/>
-          <Text style={styles.itemText}>VIEW PERSON information</Text>
+          <Image source={require('../assets/order_management.png')} style={styles.icon}/>
+          <Text style={styles.itemText}>Order{'\n'}management</Text>
         </TouchableOpacity>
 
-        {/* Nút View personal information */}
+        {/* Nút Customer support */}
         <TouchableOpacity style={styles.gridItem}>
-          <Image source={require('../assets/view_person_information.png')} style={styles.icon} />
-          <Text style={styles.itemText}>VIEW PERSON information</Text>
+          <Image source={require('../assets/customer_support.png')} style={styles.icon} />
+          <Text style={styles.itemText}>Customer{'\n'} support</Text>
         </TouchableOpacity>
 
-        {/* Nút View personal information */}
+        {/* Nút Log out */}
         <TouchableOpacity style={styles.gridItem}>
-          <Image source={require('../assets/view_person_information.png')} style={styles.icon} />
-          <Text style={styles.itemText}>VIEW PERSON information</Text>
+          <Image source={require('../assets/log_out.png')} style={styles.icon} />
+          <Text style={styles.itemText}>Log out</Text>
         </TouchableOpacity>
       </View>
 
@@ -55,14 +55,13 @@ const styles = StyleSheet.create({
   container:{ // Áp dụng cho view bự chứa các nút
     flex: 1, // Cho phép View container chiếm toàn bộ không gian của màn hình
     padding: 16, // Thêm khoảng cách bên trong (padding) xung quanh nội dung của container
-    backgroundColor: "#e0e0e0", // Thiết lập màu nền cho container.
+    backgroundColor: "#b9c3c4", // Thiết lập màu nền cho container.
     marginTop: StatusBar.currentHeight,
   },
   gridContainer:{ // Áp dụng cho view mỗi nút
     flexDirection: "row", // Sắp xếp các phần tử con của gridCongtainer theo chiều ngang
     flexWrap: "wrap", // Cho phép các phần tử con tự động di chuyển xuống hàng mới nếu không đủ trong 1 hàng
     justifyContent: "space-between", // Căn các phần tử con đều nhau theo chiều ngang
-    backgroundColor: 'red'
   },
   gridItem: { // Áp dụng cho <TouchableOpacity style={styles.gridItem}> (nút)
   flexDirection: 'column', // Sắp xếp các phần tử con của gridItem theo cột dọc
@@ -72,9 +71,9 @@ const styles = StyleSheet.create({
   borderRadius: 10, // Thiết lập góc bo tròn cho gridItem
  // padding: 20, // Thêm khoảng cách bên trong (padding) cho gridItem
   // margin: 10, // Thêm khoảng cách bên ngoài (margin) cho gridItem
-  marginHorizontal: 16,
-  marginVertical: 10,
-  width: '40%', // Thiết lập chiều rộng cho gridItem
+  //marginHorizontal: 16,
+  marginVertical: 6,
+  width: '48%', // Thiết lập chiều rộng cho gridItem
   height: 120, // Thiết lập chiều cao cho gridItem
   elevation: 5, // Thêm hiệu ứng bóng trên Android cho gridItem
   backgroundColor: 'white'
@@ -85,7 +84,7 @@ icon:{ //Áp dụng cho icon trong mỗi nút
 },
 itemText: { // Áp dụng cho <Text style={styles.itemText}>
   textAlign: 'center', // Căn giữa văn bản theo chiều ngang
-  fontSize: 14, // Thiết lập kích thước chữ cho văn bản
+  fontSize: 18, // Thiết lập kích thước chữ cho văn bản
   fontWeight: 'bold', // Thiết lập chữ đậm cho văn bản
 },
 
