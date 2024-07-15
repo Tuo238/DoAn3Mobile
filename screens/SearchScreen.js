@@ -8,14 +8,14 @@ import {
   Image,
   TouchableOpacity,
   Button,
+  TextInput,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import CategorySelector from "../components/CategorySelector";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
 
-export default function HomeScreen({ navigation }) {
+export default function SearchScreen({ navigation }) {
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
@@ -88,9 +88,7 @@ export default function HomeScreen({ navigation }) {
                 <Text>No Image</Text>
               </View>
             )}
-            <Text style={styles.title} numberOfLines={2}>
-              {item.name}
-            </Text>
+            <Text style={styles.title}>{item.name}</Text>
             <Text>₫ {item.price}</Text>
           </View>
         </View>
@@ -101,7 +99,10 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.BC}>
       <View style={styles.container}>
-        <CategorySelector style={styles.category} navigation={navigation} />
+        <View style={styles.searchContainer}>
+          <Ionicons name={"search"} size={30} />
+          <TextInput placeholder="Search" style={styles.searchInput} />
+        </View>
         <FlatList
           data={products}
           renderItem={renderItem}
@@ -126,21 +127,28 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight,
   },
 
-  category: {},
-
+  searchContainer: {
+    flexDirection: "row",
+    marginHorizontal: 30,
+    marginVertical: 20,
+    backgroundColor: "#FFF",
+    borderRadius: 25,
+    padding: 10,
+  },
+  searchInput: {
+    width: "90%",
+    textAlign: "center",
+  },
   list: {
     flex: 1, // Ensure the list takes up the remaining space in the container
-    width: "100%",
   },
   listContent: {
     paddingBottom: 20, // Optional: add padding to the bottom of the list
     // width: 180,
-    alignItems: "center",
-    // justifyContent: "space-between",
-    // padding: 20,
+    alignItems: "left",
+    marginLeft: 15,
     // flexDirection: "row",
     // flexWrap: "wrap",
-    // marginHorizontal: "3%",
   },
   item: {
     backgroundColor: "#fff",
@@ -149,24 +157,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     // margin: 10,
     width: "95%",
-    // height: "75%",
-    justifyContent: "center",
     borderRadius: 10,
   },
   innerItem: {
-    // marginLeft: 0,
-    justifyContent: "center",
-    // width: "1000",
+    marginLeft: 0,
   },
   title: {
     fontSize: 16,
-    height: 50,
-    width: 100,
   },
   image: {
     width: 150,
     height: 150,
-    justifyContent: "center",
   },
   placeholderImage: {
     width: 150,
@@ -178,7 +179,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // width: "70%",
   },
   ratingContainer: {
     flexDirection: "row",

@@ -15,6 +15,9 @@ export default function CategorySelector({ navigation }) {
     <View style={styles.container}>
       <Pressable
         style={{ alignItems: "flex-end", marginRight: 20, marginTop: 5 }}
+        onPress={() => {
+          navigation.navigate("SearchScreen");
+        }}
       >
         <Ionicons name={"search"} size={30} />
       </Pressable>
