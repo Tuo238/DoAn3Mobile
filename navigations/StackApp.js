@@ -3,6 +3,7 @@ import HomeScreen from "../screens/HomeScreen";
 import ProductDetails from "../screens/ProductDetails";
 import CategorizedProduct from "../screens/CategorizedProductScreen";
 import TestStack from "../screens/TestStack";
+import PurchaseHistoryScreen from "../screens/PurchaseHistoryScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,14 @@ export function HomeStack() {
           title: "Home",
           headerStyle: { backgroundColor: "#BAC3C3" },
         }}
+      />
+      <Stack.Screen
+        name="PurchaseHistory"
+        component={PurchaseHistoryScreen}
+        // options={{
+        //  // title: "Purchase History",
+        //   headerStyle: { backgroundColor: "#BAC3C3" },
+        // }}
       />
     </Stack.Navigator>
   );

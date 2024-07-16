@@ -9,6 +9,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import SignInScreen from "./screens/SignInScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import ForgotPassword from "./screens/ForgotPassword";
+import PurchaseHistoryScreen from "./screens/PurchaseHistoryScreen";
 
 import { HomeStack } from "./navigations/StackApp";
 
@@ -88,6 +89,11 @@ export default function App() {
         <Stack.Screen
           name="Main"
           component={TabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PurchaseHistoryScreen"
+          component={PurchaseHistoryScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

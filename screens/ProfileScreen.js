@@ -2,6 +2,7 @@
 import React from "react";
 // Import các thành phần cần thiết từ thư viện React
 import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 // Định nghĩa một hàm chức năng có tên là ProfileScreen và xuất mặc định hàm này ra ngoài
 export default function ProfileScreen({ navigation, route }) {
@@ -28,7 +29,7 @@ export default function ProfileScreen({ navigation, route }) {
         </TouchableOpacity>
 
         {/* Nút View Order Management */}
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem}  onPress={() => navigation.navigate('PurchaseHistory')}>
           <Image source={require('../assets/order_management.png')} style={styles.icon}/>
           <Text style={styles.itemText}>Order{'\n'}management</Text>
         </TouchableOpacity>
