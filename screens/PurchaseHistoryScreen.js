@@ -1,97 +1,105 @@
-// Import thư viện React
+// Import các thành phần cần thiết từ React và React Native
 import React, { useState } from "react";
-
-// Import các thành phần cần thiết từ thư viện React Native
 import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar, ScrollView, FlatList } from "react-native";
 
-// Định nghĩa một hàm chức năng có tên là PurchaseHistoryScreen và xuất mặc định hàm này ra ngoài
+// Khai báo hàm chức năng chính của màn hình PurchaseHistoryScreen
 export default function PurchaseHistoryScreen({ navigation, route }) {
-  // Sử dụng hook useState để lưu trữ trạng thái của mục đang được chọn, mặc định là 'Processing'
+  // Khai báo state selectedStatus và hàm setSelectedStatus để cập nhật trạng thái
   const [selectedStatus, setSelectedStatus] = useState('Processing');
 
-  // Dữ liệu mẫu cho danh sách đơn hàng
+  // Khai báo dữ liệu mẫu cho danh sách các đơn hàng
   const data = [
     {
-      id: '1',
-      store: 'School supplies store', // Tên cửa hàng
-      product: 'Children\'s tables and chairs', // Sản phẩm
+      id: '1', // ID duy nhất của mục
+      store: 'Reebok', // Tên cửa hàng
+      product: 'Reebok Turbo Restyle Unisex Sports Shoes', // Tên sản phẩm
       quantity: 'x1', // Số lượng
-      price: '5$', // Giá
-      status: 'Successful delivery', // Trạng thái đơn hàng
+      price: '47.2$', // Giá
+      status: 'Waiting for the store to process', // Trạng thái đơn hàng
       payMethod: 'Cash', // Phương thức thanh toán
       image: require('../assets/customer_support.png'), // Đường dẫn tới hình ảnh sản phẩm
     },
     {
-      id: '2',
-      store: 'Mandinni Store', // Tên cửa hàng
-      product: 'Men\'s polo shirt', // Sản phẩm
-      quantity: 'x2', // Số lượng
-      price: '8$', // Giá
-      status: 'Successful delivery', // Trạng thái đơn hàng
+      id: '2', // ID duy nhất của mục
+      store: 'Akko', // Tên cửa hàng
+      product: 'Keyboard AKKO 3108 Dragon Ball Z - Goku (Akko Pink sw)', // Tên sản phẩm
+      quantity: 'x1', // Số lượng
+      price: '66.75$', // Giá
+      status: 'Waiting for the store to process', // Trạng thái đơn hàng
       payMethod: 'Bank transfer', // Phương thức thanh toán
-      image: require('../assets/ban_ghe.png'), // Đường dẫn tới hình ảnh sản phẩm
+      image: require('../assets/customer_support.png'), // Đường dẫn tới hình ảnh sản phẩm
     },
     {
-        id: '3',
-        store: 'Mandinni Store', // Tên cửa hàng
-        product: 'Men\'s polo shirt', // Sản phẩm
-        quantity: 'x2', // Số lượng
-        price: '8$', // Giá
-        status: 'Successful delivery', // Trạng thái đơn hàng
-        payMethod: 'Bank transfer', // Phương thức thanh toán
-        image: require('../assets/customer_support.png'), // Đường dẫn tới hình ảnh sản phẩm
-      },
+      id: '3', // ID duy nhất của mục
+      store: 'Akko', // Tên cửa hàng
+      product: 'Keyboard AKKO 3108 Dragon Ball Z - Goku (Akko Pink sw)', // Tên sản phẩm
+      quantity: 'x1', // Số lượng
+      price: '66.75$', // Giá
+      status: 'Waiting for the store to process', // Trạng thái đơn hàng
+      payMethod: 'Bank transfer', // Phương thức thanh toán
+      image: require('../assets/customer_support.png'), // Đường dẫn tới hình ảnh sản phẩm
+    }
     // Thêm các mục khác nếu cần
   ];
 
-  // Trả về giao diện của thành phần PurchaseHistoryScreen
   return (
+    // Thành phần chứa chính của màn hình, thiết lập các kiểu dáng từ styles.container
     <View style={styles.container}>
-      {/* Thiết lập kiểu hiển thị của thanh trạng thái (StatusBar) */}
+      {/* Thiết lập thanh trạng thái */}
       <StatusBar barStyle="dark-content" />
-      {/* Hiển thị tiêu đề của màn hình */}
-      <Text style={styles.title}>Purchase History</Text>
+      {/* Hiển thị tiêu đề */}
+      <Text style={styles.title}>PURCHASE HISTORY</Text>
       
-      {/* ScrollView cho phép cuộn ngang các mục trạng thái */}
+      {/* Thanh cuộn ngang để chọn trạng thái đơn hàng */}
       <ScrollView horizontal style={styles.scrollContainer} showsHorizontalScrollIndicator={false}>
-        {/* Mục trạng thái 'Processing' */}
+        {/* Nút chọn trạng thái 'Processing' */}
         <TouchableOpacity onPress={() => setSelectedStatus('Processing')}>
-          {/* Áp dụng kiểu cho văn bản, bao gồm cả kiểu được chọn nếu 'Processing' đang được chọn */}
           <Text style={[styles.statusText, selectedStatus === 'Processing' && styles.selectedStatus]}>Processing</Text>
         </TouchableOpacity>
-        {/* Mục trạng thái 'Delivering' */}
+        {/* Nút chọn trạng thái 'Delivering' */}
         <TouchableOpacity onPress={() => setSelectedStatus('Delivering')}>
-          {/* Áp dụng kiểu cho văn bản, bao gồm cả kiểu được chọn nếu 'Delivering' đang được chọn */}
           <Text style={[styles.statusText, selectedStatus === 'Delivering' && styles.selectedStatus]}>Delivering</Text>
         </TouchableOpacity>
-        {/* Mục trạng thái 'Delivered' */}
+        {/* Nút chọn trạng thái 'Delivered' */}
         <TouchableOpacity onPress={() => setSelectedStatus('Delivered')}>
-          {/* Áp dụng kiểu cho văn bản, bao gồm cả kiểu được chọn nếu 'Delivered' đang được chọn */}
           <Text style={[styles.statusText, selectedStatus === 'Delivered' && styles.selectedStatus]}>Delivered</Text>
         </TouchableOpacity>
-        {/* Mục trạng thái 'Cancelled/Delivery failed' */}
+        {/* Nút chọn trạng thái 'Cancelled/Delivery failed' */}
         <TouchableOpacity onPress={() => setSelectedStatus('Cancelled/Delivery failed')}>
-          {/* Áp dụng kiểu cho văn bản, bao gồm cả kiểu được chọn nếu 'Cancelled/Delivery failed' đang được chọn */}
           <Text style={[styles.statusText, selectedStatus === 'Cancelled/Delivery failed' && styles.selectedStatus]}>Cancelled/Delivery failed</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* FlatList để hiển thị danh sách đơn hàng */}
+      {/* Danh sách các đơn hàng */}
       <FlatList
-        data={data} // Dữ liệu đầu vào của FlatList
-        keyExtractor={item => item.id} // Khóa để xác định mỗi mục
+        data={data} // Dữ liệu nguồn
+        keyExtractor={item => item.id} // Khóa duy nhất cho mỗi mục
         renderItem={({ item }) => (
+          // Thành phần hiển thị từng mục trong danh sách
           <View style={styles.listItem}>
+            {/* Hình ảnh sản phẩm */}
             <Image source={item.image} style={styles.productImage} />
             <View style={styles.itemDetails}>
-              <Text style={styles.storeName}>{item.store}</Text>
+              <View style={styles.storeRow}>
+                {/* Biểu tượng cửa hàng */}
+                <Image source={require('../assets/icon_store.png')} style={styles.storeIcon} />
+                {/* Tên cửa hàng */}
+                <Text style={styles.storeName}>{item.store}</Text>
+              </View>
+              {/* Tên sản phẩm và số lượng */}
               <Text>{item.product} {item.quantity}</Text>
-              <Text>Total: {item.price}</Text>
-              <Text>{item.status}</Text>
-              <Text>Pay method: {item.payMethod}</Text>
-              <TouchableOpacity style={styles.evaluateButton}>
-                <Text style={styles.evaluateText}>Evaluate</Text>
-              </TouchableOpacity>
+              {/* Tổng giá */}
+              <Text style={styles.price}>Total: <Text style={styles.priceValue}>{item.price}</Text></Text>
+              {/* Trạng thái đơn hàng */}
+              <Text style={styles.status}>{item.status}</Text>
+              {/* Phương thức thanh toán */}
+              <Text style={styles.payMethod}>Pay method: {item.payMethod}</Text>
+              {/* Nút hủy đơn hàng, chỉ hiển thị khi trạng thái không phải là 'Delivering' */}
+              {selectedStatus !== 'Delivering' && (
+                <TouchableOpacity style={styles.cancelButton}>
+                  <Text style={styles.cancelButtonText}>Cancel order</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
@@ -100,64 +108,92 @@ export default function PurchaseHistoryScreen({ navigation, route }) {
   );
 }
 
-// Định nghĩa các kiểu dáng cho thành phần sử dụng StyleSheet
+// Khai báo các kiểu dáng cho các thành phần
 const styles = StyleSheet.create({
-  container: { // Kiểu cho container chính của màn hình
-    flex: 1, // Chiếm toàn bộ không gian của màn hình
+  container: {
+    flex: 1, // Chiếm toàn bộ không gian
     backgroundColor: "#fff", // Màu nền trắng
-    paddingTop: StatusBar.currentHeight, // Đệm phía trên để tránh chồng lên thanh trạng thái
+    paddingTop: StatusBar.currentHeight, // Khoảng cách đệm từ đầu màn hình đến thanh trạng thái
   },
-  title: { // Kiểu cho tiêu đề của màn hình
-    fontSize: 24, // Kích thước chữ 24
-    fontWeight: "bold", // Chữ đậm
-    textAlign: 'center', // Căn giữa
-    marginVertical: 20, // Khoảng cách trên dưới 20
+  title: {
+    fontSize: 24, // Kích thước chữ
+    fontWeight: "bold", // Độ đậm của chữ
+    textAlign: 'center', // Canh giữa
+    marginVertical: 20, // Khoảng cách trên và dưới
   },
-  scrollContainer: { // Kiểu cho ScrollView chứa các mục trạng thái
-    flexDirection: 'row', // Sắp xếp các mục theo chiều ngang
-    marginVertical: 10, // Khoảng cách trên dưới 10
+  scrollContainer: {
+    flexDirection: 'row', // Hiển thị các thành phần theo hàng ngang
+    marginVertical: 10, // Khoảng cách trên và dưới
   },
-  statusText: { // Kiểu cho văn bản của các mục trạng thái
-    fontSize: 16, // Kích thước chữ 16
-    fontWeight: "bold", // Chữ đậm
-    marginHorizontal: 15, // Khoảng cách hai bên 15
-    color: 'black', // Màu chữ đen
+  statusText: {
+    fontSize: 16, // Kích thước chữ
+    fontWeight: "bold", // Độ đậm của chữ
+    marginHorizontal: 15, // Khoảng cách hai bên
+    color: 'black', // Màu chữ
   },
-  selectedStatus: { // Kiểu cho văn bản của mục trạng thái đang được chọn
-    fontWeight: 'bold', // Chữ đậm
-    color: 'green', // Màu chữ xanh
-    textDecorationLine: 'underline', // Gạch chân văn bản
+  selectedStatus: {
+    fontWeight: 'bold', // Độ đậm của chữ
+    color: 'green', // Màu chữ khi được chọn
+    textDecorationLine: 'underline', // Gạch chân chữ
   },
-  listItem: { // Kiểu cho mỗi mục trong danh sách đơn hàng
-    flexDirection: 'row', // Sắp xếp các mục theo chiều ngang
-    padding: 10, // Đệm trong 10
-    marginVertical: 5, // Khoảng cách trên dưới 5
-    marginHorizontal: 10, // Khoảng cách hai bên 10
-    backgroundColor: '#f8f8f8', // Màu nền xám nhạt
-    borderRadius: 5, // Bo tròn góc 5
-    elevation: 2, // Hiệu ứng đổ bóng trên Android
+  listItem: {
+    flexDirection: 'row', // Hiển thị các thành phần theo hàng ngang
+    padding: 10, // Khoảng cách bên trong
+    marginVertical: 5, // Khoảng cách trên và dưới
+    marginHorizontal: 10, // Khoảng cách hai bên
+    backgroundColor: '#f8f8f8', // Màu nền
+    borderRadius: 5, // Bo tròn góc
+    elevation: 2, // Độ nổi của thành phần
   },
-  productImage: { // Kiểu cho hình ảnh sản phẩm
-    width: 80, // Chiều rộng 80
-    height: 80, // Chiều cao 80
-    marginRight: 10, // Khoảng cách bên phải 10
+  productImage: {
+    width: 80, // Chiều rộng hình ảnh
+    height: 80, // Chiều cao hình ảnh
+    marginRight: 10, // Khoảng cách phải
   },
-  itemDetails: { // Kiểu cho chi tiết sản phẩm
+  itemDetails: {
     flex: 1, // Chiếm toàn bộ không gian còn lại
   },
-  storeName: { // Kiểu cho tên cửa hàng
-    fontWeight: 'bold', // Chữ đậm
-    fontSize: 16, // Kích thước chữ 16
+  storeRow: {
+    flexDirection: 'row', // Hiển thị các thành phần theo hàng ngang
+    alignItems: 'center', // Canh giữa theo chiều dọc
   },
-  evaluateButton: { // Kiểu cho nút "Evaluate"
-    backgroundColor: '#ff4081', // Màu nền hồng đậm
-    borderRadius: 5, // Bo tròn góc 5
-    paddingVertical: 5, // Đệm trên dưới 5
-    paddingHorizontal: 10, // Đệm hai bên 10
-    alignSelf: 'flex-start', // Căn trái
-    marginTop: 5, // Khoảng cách trên 5
+  storeIcon: {
+    width: 20, // Chiều rộng biểu tượng
+    height: 20, // Chiều cao biểu tượng
+    marginRight: 5, // Khoảng cách phải
   },
-  evaluateText: { // Kiểu cho văn bản bên trong nút "Evaluate"
-    color: '#fff', // Màu chữ trắng
+  storeName: {
+    fontWeight: 'bold', // Độ đậm của chữ
+    fontSize: 16, // Kích thước chữ
+  },
+  price: {
+    fontSize: 14, // Kích thước chữ
+    fontWeight: 'bold', // Độ đậm của chữ
+    marginTop: 5, // Khoảng cách trên
+  },
+  priceValue: {
+    fontSize: 14, // Kích thước chữ
+    fontWeight: 'bold', // Độ đậm của chữ
+    color: '#ff4081', // Màu hồng đậm như nút "Cancel order"
+  },
+  status: {
+    fontSize: 12, // Kích thước chữ
+    color: '#777', // Màu chữ
+    marginTop: 5, // Khoảng cách trên
+  },
+  payMethod: {
+    fontSize: 12, // Kích thước chữ
+    color: '#777', // Màu chữ
+  },
+  cancelButton: {
+    backgroundColor: '#ff4081', // Màu nền nút hủy đơn
+    borderRadius: 5, // Bo tròn góc
+    paddingVertical: 5, // Khoảng cách bên trong theo chiều dọc
+    paddingHorizontal: 10, // Khoảng cách bên trong theo chiều ngang
+    alignSelf: 'flex-start', // Canh đầu
+    marginTop: 10, // Khoảng cách trên
+  },
+  cancelButtonText: {
+    color: '#fff', // Màu chữ
   },
 });
