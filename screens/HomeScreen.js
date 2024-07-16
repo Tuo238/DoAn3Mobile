@@ -37,7 +37,6 @@ export default function HomeScreen({ navigation }) {
               try {
                 const storageRef = ref(storage, imagePath);
                 const url = await getDownloadURL(storageRef);
-                // console.log(`Fetched URL: ${url}`); // Debug log
                 return url;
               } catch (error) {
                 console.error(`Error fetching URL for ${imagePath}:`, error);

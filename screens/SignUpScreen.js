@@ -49,6 +49,8 @@ export default function SignUpScreen({ navigation }) {
         name,
         address,
         email,
+        cart: [],
+        orders: [],
         createdAt: new Date(),
       });
 
@@ -74,7 +76,7 @@ export default function SignUpScreen({ navigation }) {
         />
         <TextInput
           style={styles.InputStyle}
-          placeholder="Last name"
+          placeholder="Address"
           value={address}
           onChangeText={setAddress}
         />
@@ -115,13 +117,13 @@ export default function SignUpScreen({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.googleButton}
         // onPress={navigation.navigate("SignIn")}
       >
         <Ionicons name={"logo-google"} size={27} color="white" />
         <Text style={styles.googleText}>Continue with Google</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
