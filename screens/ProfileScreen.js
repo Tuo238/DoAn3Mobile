@@ -1,11 +1,52 @@
 // Import thư viện React
 import React from "react";
 // Import các thành phần cần thiết từ thư viện React
-import { View, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  StatusBar,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "../src/firebase/Config";
 
 // Định nghĩa một hàm chức năng có tên là ProfileScreen và xuất mặc định hàm này ra ngoài
 export default function ProfileScreen({ navigation, route }) {
+  const auth = getAuth(app);
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Log out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Logout cancelled"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            auth
+              .signOut()
+              .then(() => {
+                console.log("Logged out");
+                // navigation.replace("LoginScreen"); // Navigate to login screen or any other screen after logging out
+              })
+              .catch((error) => {
+                console.error("Error logging out: ", error);
+              });
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   // Trả về giao diện của thành phần ProfileScreen
   return (
     <View style={styles.container}>
@@ -37,9 +78,15 @@ export default function ProfileScreen({ navigation, route }) {
         </TouchableOpacity>
 
         {/* Nút View Order Management */}
-        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('PurchaseHistory')}>
-          <Image source={require('../assets/order_management.png')} style={styles.icon}/>
-          <Text style={styles.itemText}>Order{'\n'}management</Text>
+        <TouchableOpacity
+          style={styles.gridItem}
+          onPress={() => navigation.navigate("PurchaseHistory")}
+        >
+          <Image
+            source={require("../assets/order_management.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.itemText}>Order{"\n"}management</Text>
         </TouchableOpacity>
 
         {/* Nút Customer support */}
@@ -52,7 +99,15 @@ export default function ProfileScreen({ navigation, route }) {
         </TouchableOpacity>
 
         {/* Nút Log out */}
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity
+          style={styles.gridItem}
+          // onPress={() => {
+          //   auth.signOut().then(() => {
+          //     console.log("logged out");
+          //   });
+          // }}
+          onPress={handleLogout}
+        >
           <Image
             source={require("../assets/log_out.png")}
             style={styles.icon}

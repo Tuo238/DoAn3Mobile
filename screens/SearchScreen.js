@@ -88,7 +88,9 @@ export default function SearchScreen({ navigation }) {
                 <Text>No Image</Text>
               </View>
             )}
-            <Text style={styles.title}>{item.name}</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {item.name}
+            </Text>
             <Text>₫ {item.price}</Text>
           </View>
         </View>
@@ -127,6 +129,22 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight,
   },
 
+  category: {},
+
+  list: {
+    flex: 1, // Ensure the list takes up the remaining space in the container
+    width: "100%",
+  },
+  listContent: {
+    paddingBottom: 20, // Optional: add padding to the bottom of the list
+    // width: 180,
+    alignItems: "center",
+    // justifyContent: "space-between",
+    // padding: 20,
+    // flexDirection: "row",
+    // flexWrap: "wrap",
+    // marginHorizontal: "3%",
+  },
   searchContainer: {
     flexDirection: "row",
     marginHorizontal: 30,
@@ -139,17 +157,7 @@ const styles = StyleSheet.create({
     width: "90%",
     textAlign: "center",
   },
-  list: {
-    flex: 1, // Ensure the list takes up the remaining space in the container
-  },
-  listContent: {
-    paddingBottom: 20, // Optional: add padding to the bottom of the list
-    // width: 180,
-    alignItems: "left",
-    marginLeft: 15,
-    // flexDirection: "row",
-    // flexWrap: "wrap",
-  },
+
   item: {
     backgroundColor: "#fff",
     padding: 10,
@@ -157,17 +165,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     // margin: 10,
     width: "95%",
+    // height: "75%",
+    justifyContent: "center",
     borderRadius: 10,
   },
   innerItem: {
-    marginLeft: 0,
+    // marginLeft: 0,
+    justifyContent: "center",
+    // width: "1000",
   },
   title: {
     fontSize: 16,
+    height: 50,
+    width: 100,
   },
   image: {
     width: 150,
     height: 150,
+    justifyContent: "center",
   },
   placeholderImage: {
     width: 150,
@@ -179,6 +194,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    // width: "70%",
   },
   ratingContainer: {
     flexDirection: "row",
