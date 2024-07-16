@@ -12,7 +12,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../src/firebase/Config";
 
-export default function Signin({ navigation }) {
+export default function SignIn({ navigation }) {
   const auth = getAuth(app);
 
   const [emailSI, setEmail] = useState("");

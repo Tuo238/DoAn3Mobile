@@ -21,8 +21,8 @@ export default function SignUpScreen({ navigation }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, settName] = useState("");
+  const [address, setAddress] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,8 +46,8 @@ export default function SignUpScreen({ navigation }) {
 
       // Save user data to Firestore with document ID as user UID
       await setDoc(doc(db, "users", user.uid), {
-        firstName,
-        lastName,
+        name,
+        address,
         email,
         createdAt: new Date(),
       });
@@ -67,16 +67,16 @@ export default function SignUpScreen({ navigation }) {
       <Text style={styles.title}>Create Account</Text>
       <View style={styles.InputContainer}>
         <TextInput
-          placeholder="First name"
+          placeholder="Full name"
           style={styles.InputStyle}
-          value={firstName}
-          onChangeText={setFirstName}
+          value={name}
+          onChangeText={settName}
         />
         <TextInput
           style={styles.InputStyle}
           placeholder="Last name"
-          value={lastName}
-          onChangeText={setLastName}
+          value={address}
+          onChangeText={setAddress}
         />
         <TextInput
           placeholder="Email address"
@@ -117,7 +117,7 @@ export default function SignUpScreen({ navigation }) {
 
       <TouchableOpacity
         style={styles.googleButton}
-        onPress={navigation.navigate("SignIn")}
+        // onPress={navigation.navigate("SignIn")}
       >
         <Ionicons name={"logo-google"} size={27} color="white" />
         <Text style={styles.googleText}>Continue with Google</Text>
