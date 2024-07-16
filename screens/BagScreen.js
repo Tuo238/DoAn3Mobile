@@ -11,8 +11,6 @@ import {
   Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import HomeScreen from "./HomeScreen";
-import CategorySelector from "../components/CategorySelector";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";

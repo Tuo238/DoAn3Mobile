@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Button,
-  TouchableOpacity,
-} from "react-native";
-
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { app } from "../src/firebase/Config";
 
 export default function PersonalInformationScreen({ navigation }) {
   const db = getFirestore(app);
+  const auth = getAuth(app);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getUserById("5kRGmH6lLlWwBbwKt1ZEMJtIOy73"); // Thay đổi ID người dùng thực tế ở đây
+    const fetchUser = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await getUserById(currentUser.uid);
+      } else {
+        console.log("No user is signed in.");
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const getUserById = async (userId) => {
@@ -28,9 +31,8 @@ export default function PersonalInformationScreen({ navigation }) {
         const data = docSnapshot.data();
         const userData = {
           id: docSnapshot.id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phone, // Thêm trường số điện thoại
+          name: data.name,
+          address: data.address,
           createdAt: data.createdAt
             ? data.createdAt.toDate().toLocaleString()
             : "N/A",
@@ -51,15 +53,11 @@ export default function PersonalInformationScreen({ navigation }) {
     return (
       <View style={styles.itemcontainer}>
         <View style={styles.item1}>
-          <Text style={styles.nd}>{user.firstName || "N/A"}</Text>
-        </View>
-
-        <View style={styles.item2}>
-          <Text style={styles.nd}>{user.lastName || "N/A"}</Text>
+          <Text style={styles.nd}>{user.name || "N/A"}</Text>
         </View>
 
         <View style={styles.item3}>
-          <Text style={styles.nd}>{user.phone || "N/A"}</Text>
+          <Text style={styles.nd}>{user.address || "N/A"}</Text>
         </View>
 
         <View style={styles.item4}>
@@ -81,8 +79,8 @@ export default function PersonalInformationScreen({ navigation }) {
         {renderUser()}
 
         <TouchableOpacity
-          style={styles.button} // Thêm kiểu dáng cho nút
-          onPress={() => navigation.navigate("UpdateProfile", { item: user })} // Thay đổi 'item' nếu cần
+          style={styles.button}
+          onPress={() => navigation.navigate("UpdateProfile", { item: user })}
         >
           <Text style={styles.buttonText}>UPDATE</Text>
         </TouchableOpacity>
@@ -112,50 +110,35 @@ const styles = StyleSheet.create({
     padding: "auto",
     marginTop: 20,
     borderRadius: 8,
-
     width: "90%",
   },
   item1: {
-    marginBottom: 20, // Khoảng cách giữa các phần tử
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item2: {
-    marginBottom: 20, // Khoảng cách giữa các phần tử
+    marginBottom: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     width: 300,
     height: 40,
   },
   item3: {
-    marginBottom: 20, // Khoảng cách giữa các phần tử
+    marginBottom: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     width: 300,
     height: 40,
   },
   item4: {
-    marginBottom: 20, // Khoảng cách giữa các phần tử
+    marginBottom: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     width: 300,
     height: 40,
   },
   item5: {
-    marginBottom: 20, // Khoảng cách giữa các phần tử
+    marginBottom: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     width: 300,
     height: 40,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  ltname: {
-    fontSize: 16,
   },
   nd: {
     margin: 10,
