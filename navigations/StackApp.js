@@ -6,6 +6,7 @@ import TestStack from "../screens/TestStack";
 import PurchaseHistoryScreen from "../screens/PurchaseHistoryScreen";
 import PersonalInformationScreen from "../screens/PersonalInformationScreen";
 import UpdateProfile from "../screens/UpdateProfile";
+import SearchScreen from "../screens/SearchScreen";
 const Stack = createNativeStackNavigator();
 
 export function HomeStack() {
@@ -33,6 +34,14 @@ export function HomeStack() {
           headerStyle: { backgroundColor: "#BAC3C3" },
         }}
       />
+      <Stack.Screen
+        name="SearchScreen"
+        component={SearchScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+
       <Stack.Screen
         name="PurchaseHistory"
         component={PurchaseHistoryScreen}
