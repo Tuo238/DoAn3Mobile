@@ -8,6 +8,7 @@ import BagScreen from "./screens/BagScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SignInScreen from "./screens/SignInScreen";
 import SignUpScreen from "./screens/SignUpScreen";
+import SearchScreen from "./screens/SearchScreen";
 import ForgotPassword from "./screens/ForgotPassword";
 import PurchaseHistoryScreen from "./screens/PurchaseHistoryScreen";
 
@@ -86,6 +87,12 @@ export default function App() {
           component={ForgotPassword}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="SearchScreen"
+          component={SearchScreen}
+          options={{ headerShown: false }}
+        />
+
         <Stack.Screen
           name="Main"
           component={TabNavigator}
