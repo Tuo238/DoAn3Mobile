@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Carousel from "pinar";
 
 export default function ProductDetails({ route, navigation }) {
   const { item } = route.params;
@@ -21,18 +22,27 @@ export default function ProductDetails({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity> */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Image
-          source={{ uri: item.imageUrls[0] }}
-          style={styles.image}
-          resizeMode="contain"
-        />
+        {/* Centered Carousel */}
+        <View style={styles.carouselContainer}>
+          <Carousel
+            style={styles.carousel}
+            showsControls={false}
+            dotStyle={styles.dotStyle}
+            activeDotStyle={[styles.dotStyle, { backgroundColor: "white" }]}
+          >
+            {item.imageUrls.map((imageUrl, index) => (
+              <Image
+                key={index}
+                source={{ uri: imageUrl }}
+                style={styles.carouselImage}
+                resizeMode="contain"
+              />
+            ))}
+          </Carousel>
+        </View>
+
+        {/* Product details */}
         <View style={styles.detailsContainer}>
           <View style={styles.flexbtw}>
             <View style={styles.nameElement}>
@@ -63,6 +73,8 @@ export default function ProductDetails({ route, navigation }) {
           <Text style={styles.description}>{item.description}</Text>
         </View>
       </ScrollView>
+
+      {/* Buy button container */}
       <View style={styles.buyButtonContainer}>
         <TouchableOpacity style={styles.addToCartButton}>
           <Ionicons name="bag-add-outline" size={40} color="black" />
@@ -78,18 +90,32 @@ export default function ProductDetails({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "red",
   },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 1,
+  scrollContainer: {
+    paddingBottom: 100, // Adjust as per your design
   },
-  image: {
-    width: "100%",
+  carouselContainer: {
+    alignItems: "center",
+    marginBottom: 30,
+    backgroundColor: "#BAC3C3",
+    paddingBottom: 30,
+  },
+  carousel: {
+    width: "90%",
     height: 300,
     backgroundColor: "#BAC3C3",
+  },
+  carouselImage: {
+    width: "100%",
+    height: "100%",
+  },
+  detailsContainer: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    padding: 20,
+    marginTop: -60,
+    marginBottom: 50,
   },
   flexbtw: {
     flexDirection: "row",
@@ -100,17 +126,6 @@ const styles = StyleSheet.create({
   },
   priceElement: {
     width: "35%",
-  },
-  scrollContainer: {
-    padding: 0,
-  },
-  detailsContainer: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 35,
-    borderTopRightRadius: 35,
-    padding: 20,
-    marginTop: -30,
-    marginBottom: 50,
   },
   title: {
     fontSize: 24,
@@ -185,5 +200,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
+  },
+  dotStyle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    backgroundColor: "#888",
   },
 });
