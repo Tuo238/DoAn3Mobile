@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Button,
+  ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CategorySelector from "../components/CategorySelector";
@@ -19,12 +20,14 @@ export default function HomeScreen({ navigation }) {
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getProductList();
   }, []);
 
   const getProductList = async () => {
+    setIsLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, "products"));
       const productsList = await Promise.all(
@@ -54,6 +57,7 @@ export default function HomeScreen({ navigation }) {
         })
       );
       setProducts(productsList);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching products: ", error);
     }
@@ -101,14 +105,19 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.BC}>
       <View style={styles.container}>
         <CategorySelector style={styles.category} navigation={navigation} />
-        <FlatList
-          data={products}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          numColumns={2}
-        />
+
+        {isLoading ? (
+          <ActivityIndicator size="large" color="white" />
+        ) : (
+          <FlatList
+            data={products}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            numColumns={2}
+          />
+        )}
       </View>
     </View>
   );

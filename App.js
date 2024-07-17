@@ -34,7 +34,7 @@ function TabNavigator() {
           tabBarIcon: ({ color }) => (
             <Ionicons name={"home"} size={20} color={color} />
           ),
-          tabBarBadge: 3,
+          // tabBarBadge: 3,
           headerShown: false,
         }}
       />

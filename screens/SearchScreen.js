@@ -7,37 +7,56 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Button,
   TextInput,
+  ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
 
-export default function SearchScreen({ navigation }) {
+export default function SearchScreen({ navigation, route }) {
+  // const { category } = route.params;
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    getProductList();
-  }, []);
+    if (searchText.trim() !== "") {
+      getProductList();
+    } else {
+      setProducts([]);
+    }
+  }, [searchText]);
 
   const getProductList = async () => {
+    setIsLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(db, "products"));
+      const q = query(
+        collection(db, "products"),
+        // where("category", "==", sofa),
+        where("category", "==", searchText.trim())
+      );
+      const querySnapshot = await getDocs(q);
+
       const productsList = await Promise.all(
         querySnapshot.docs.map(async (doc) => {
           const data = doc.data();
-          // console.log(`Product: ${data.name}, Image paths: ${data.images}`); // Debug log
 
           const imageUrls = await Promise.all(
             (data.image || []).map(async (imagePath) => {
               try {
                 const storageRef = ref(storage, imagePath);
                 const url = await getDownloadURL(storageRef);
-                // console.log(`Fetched URL: ${url}`); // Debug log
                 return url;
               } catch (error) {
                 console.error(`Error fetching URL for ${imagePath}:`, error);
@@ -46,18 +65,28 @@ export default function SearchScreen({ navigation }) {
             })
           );
 
-          // console.log(`Product: ${data.name}, Image URLs: ${imageUrls}`); // Debug log
           return {
             id: doc.id,
             ...data,
-            imageUrls: imageUrls.filter((url) => url !== null), // Filter out null URLs
+            imageUrls: imageUrls.filter((url) => url !== null),
           };
         })
       );
       setProducts(productsList);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching products: ", error);
+      setIsLoading(false);
     }
+  };
+
+  const handleSearchInputChange = (text) => {
+    setSearchText(text);
+  };
+
+  const handleSearchSubmit = () => {
+    Keyboard.dismiss(); // Dismiss keyboard after pressing enter
+    getProductList();
   };
 
   const renderItem = ({ item }) => {
@@ -103,16 +132,26 @@ export default function SearchScreen({ navigation }) {
       <View style={styles.container}>
         <View style={styles.searchContainer}>
           <Ionicons name={"search"} size={30} />
-          <TextInput placeholder="Search" style={styles.searchInput} />
+          <TextInput
+            placeholder="Search"
+            style={styles.searchInput}
+            value={searchText}
+            onChangeText={handleSearchInputChange}
+            onSubmitEditing={handleSearchSubmit}
+          />
         </View>
-        <FlatList
-          data={products}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          numColumns={2}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="large" color="white" />
+        ) : searchText.trim() !== "" ? (
+          <FlatList
+            data={products}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            numColumns={2}
+          />
+        ) : null}
       </View>
     </View>
   );
@@ -122,28 +161,18 @@ const styles = StyleSheet.create({
   BC: {
     flex: 1,
     backgroundColor: "#BAC3C3",
-    // paddingLeft: 20,
   },
   container: {
-    flex: 1, // Ensure the container takes up the full available height
+    flex: 1,
     marginTop: StatusBar.currentHeight,
   },
-
-  category: {},
-
   list: {
-    flex: 1, // Ensure the list takes up the remaining space in the container
+    flex: 1,
     width: "100%",
   },
   listContent: {
-    paddingBottom: 20, // Optional: add padding to the bottom of the list
-    // width: 180,
+    paddingBottom: 20,
     alignItems: "center",
-    // justifyContent: "space-between",
-    // padding: 20,
-    // flexDirection: "row",
-    // flexWrap: "wrap",
-    // marginHorizontal: "3%",
   },
   searchContainer: {
     flexDirection: "row",
@@ -154,25 +183,21 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   searchInput: {
-    width: "90%",
+    flex: 1,
+    marginLeft: 10,
     textAlign: "center",
   },
-
   item: {
     backgroundColor: "#fff",
     padding: 10,
     marginVertical: 8,
     marginHorizontal: 5,
-    // margin: 10,
     width: "95%",
-    // height: "75%",
     justifyContent: "center",
     borderRadius: 10,
   },
   innerItem: {
-    // marginLeft: 0,
     justifyContent: "center",
-    // width: "1000",
   },
   title: {
     fontSize: 16,
@@ -194,7 +219,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // width: "70%",
   },
   ratingContainer: {
     flexDirection: "row",

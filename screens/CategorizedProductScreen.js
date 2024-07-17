@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -24,12 +25,14 @@ export default function CategorizedProduct({ navigation, route }) {
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getProductList();
   }, []);
 
   const getProductList = async () => {
+    setIsLoading(true);
     try {
       const q = query(
         collection(db, "products"),
@@ -62,6 +65,7 @@ export default function CategorizedProduct({ navigation, route }) {
         })
       );
       setProducts(productsList);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching products: ", error);
     }
@@ -95,7 +99,9 @@ export default function CategorizedProduct({ navigation, route }) {
                 <Text>No Image</Text>
               </View>
             )}
-            <Text style={styles.title}>{item.name}</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {item.name}
+            </Text>
             <Text>₫ {item.price}</Text>
           </View>
         </View>
@@ -106,14 +112,18 @@ export default function CategorizedProduct({ navigation, route }) {
   return (
     <View style={styles.BC}>
       <View style={styles.container}>
-        <FlatList
-          data={products}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          numColumns={2}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="large" color="white" />
+        ) : (
+          <FlatList
+            data={products}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            numColumns={2}
+          />
+        )}
       </View>
     </View>
   );
@@ -134,14 +144,17 @@ const styles = StyleSheet.create({
 
   list: {
     flex: 1, // Ensure the list takes up the remaining space in the container
+    width: "100%",
   },
   listContent: {
     paddingBottom: 20, // Optional: add padding to the bottom of the list
     // width: 180,
-    alignItems: "left",
-    marginLeft: 15,
+    alignItems: "center",
+    // justifyContent: "space-between",
+    // padding: 20,
     // flexDirection: "row",
     // flexWrap: "wrap",
+    // marginHorizontal: "3%",
   },
   item: {
     backgroundColor: "#fff",
@@ -149,17 +162,25 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 5,
     // margin: 10,
-    width: 170,
+    width: "95%",
+    // height: "75%",
+    justifyContent: "center",
+    borderRadius: 10,
   },
   innerItem: {
-    marginLeft: 0,
+    // marginLeft: 0,
+    justifyContent: "center",
+    // width: "1000",
   },
   title: {
     fontSize: 16,
+    height: 50,
+    width: 100,
   },
   image: {
     width: 150,
     height: 150,
+    justifyContent: "center",
   },
   placeholderImage: {
     width: 150,
@@ -171,6 +192,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    // width: "70%",
   },
   ratingContainer: {
     flexDirection: "row",
