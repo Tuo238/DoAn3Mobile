@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { app } from "../src/firebase/Config";
-
+import { useRoute } from "@react-navigation/native";
 export default function PersonalInformationScreen({ navigation }) {
   const db = getFirestore(app);
   const auth = getAuth(app);
   const [user, setUser] = useState(null);
+  const route = useRoute(); // Khai báo route
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,6 +22,13 @@ export default function PersonalInformationScreen({ navigation }) {
 
     fetchUser();
   }, []);
+
+  // Cập nhật khi có dữ liệu mới từ UpdateProfile
+  useEffect(() => {
+    if (route.params?.updatedUser) {
+      setUser(route.params.updatedUser); // Cập nhật thông tin người dùng
+    }
+  }, [route.params?.updatedUser]);
 
   const getUserById = async (userId) => {
     try {
