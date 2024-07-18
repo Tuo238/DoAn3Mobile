@@ -21,6 +21,7 @@ export default function HomeScreen({ navigation }) {
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getProductList();
@@ -101,6 +102,10 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
+  const handleRefresh = () => {
+    getProductList();
+  };
+
   return (
     <View style={styles.BC}>
       <View style={styles.container}>
@@ -116,6 +121,8 @@ export default function HomeScreen({ navigation }) {
             style={styles.list}
             contentContainerStyle={styles.listContent}
             numColumns={2}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
           />
         )}
       </View>

@@ -10,43 +10,37 @@ import {
   TextInput,
   ActivityIndicator,
   Keyboard,
+  Modal,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
 
-export default function SearchScreen({ navigation, route }) {
-  // const { category } = route.params;
+export default function SearchScreen({ navigation }) {
   const db = getFirestore(app);
   const storage = getStorage(app);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [modalVisible, setVisible] = useState(false);
+  const [sortOrder, setSortOrder] = useState("asc"); // asc for ascending, desc for descending
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (searchText.trim() !== "") {
-      getProductList();
+      // getProductList();
     } else {
       setProducts([]);
     }
-  }, [searchText]);
+  }, [searchText, sortOrder, minPrice, maxPrice]);
 
   const getProductList = async () => {
     setIsLoading(true);
     try {
-      const q = query(
-        collection(db, "products"),
-        // where("category", "==", sofa),
-        where("category", "==", searchText.trim())
-      );
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(collection(db, "products"));
 
       const productsList = await Promise.all(
         querySnapshot.docs.map(async (doc) => {
@@ -72,7 +66,30 @@ export default function SearchScreen({ navigation, route }) {
           };
         })
       );
-      setProducts(productsList);
+
+      // Filter products based on search text and price range
+      const filteredProducts = productsList.filter((product) => {
+        const matchesCategory =
+          product.name &&
+          product.name.toLowerCase().includes(searchText.trim().toLowerCase());
+        // const withinPriceRange =
+        //   (!minPrice || product.price >= parseFloat(minPrice)) &&
+        //   (!maxPrice || product.price <= parseFloat(maxPrice));
+
+        // return matchesCategory && withinPriceRange;
+        return matchesCategory;
+      });
+
+      // Sort products by price based on sortOrder
+      filteredProducts.sort((a, b) => {
+        if (sortOrder === "asc") {
+          return a.price - b.price;
+        } else {
+          return b.price - a.price;
+        }
+      });
+
+      setProducts(filteredProducts);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching products: ", error);
@@ -87,6 +104,11 @@ export default function SearchScreen({ navigation, route }) {
   const handleSearchSubmit = () => {
     Keyboard.dismiss(); // Dismiss keyboard after pressing enter
     getProductList();
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    getProductList().finally(() => setRefreshing(false));
   };
 
   const renderItem = ({ item }) => {
@@ -139,6 +161,9 @@ export default function SearchScreen({ navigation, route }) {
             onChangeText={handleSearchInputChange}
             onSubmitEditing={handleSearchSubmit}
           />
+          <TouchableOpacity onPress={() => setVisible(true)}>
+            <Ionicons name={"menu-outline"} size={30} />
+          </TouchableOpacity>
         </View>
         {isLoading ? (
           <ActivityIndicator size="large" color="white" />
@@ -150,8 +175,73 @@ export default function SearchScreen({ navigation, route }) {
             style={styles.list}
             contentContainerStyle={styles.listContent}
             numColumns={2}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
           />
         ) : null}
+        <Modal
+          visible={modalVisible}
+          onRequestClose={() => setVisible(false)}
+          style={styles.modalContainer}
+          animationType="slide"
+        >
+          <View>
+            <Text style={styles.modalTitle}>Price Range:</Text>
+            <View style={styles.modalInputContainer}>
+              <TextInput
+                placeholder="MINIMUM"
+                style={styles.modalInputStyle}
+                keyboardType="number-pad"
+                value={minPrice}
+                onChangeText={(text) => setMinPrice(text)}
+              />
+              <TextInput
+                placeholder="MAXIMUM"
+                style={styles.modalInputStyle}
+                keyboardType="number-pad"
+                value={maxPrice}
+                onChangeText={(text) => setMaxPrice(text)}
+              />
+            </View>
+
+            <Text style={styles.modalTitle}>Sort by:</Text>
+
+            <View style={styles.sortButtonsContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  setSortOrder("asc");
+                  getProductList();
+                  setVisible(false);
+                }}
+                style={styles.sortButtons}
+              >
+                <Text>Lowest to Highest</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setSortOrder("desc");
+                  getProductList();
+                  setVisible(false);
+                }}
+                style={styles.sortButtons}
+              >
+                <Text>Highest to Lowest</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setMinPrice("");
+                  setMaxPrice("");
+                  setSortOrder("asc");
+                  setVisible(false);
+                }}
+                style={styles.sortButtons}
+              >
+                <Text>Discard Filter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );
@@ -223,5 +313,48 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  modalContainer: {
+    height: 50,
+    borderRadius: 50,
+  },
+  modalInputContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: -50,
+  },
+  modalInputStyle: {
+    width: "45%",
+    height: 50,
+    alignItems: "center",
+    borderColor: "green",
+    borderRadius: 15,
+    backgroundColor: "#E0E0E0",
+    margin: 5,
+    padding: 12,
+    fontSize: 15,
+  },
+  modalTitle: {
+    fontSize: 34,
+    fontWeight: "bold",
+    marginBottom: 10,
+    padding: 10,
+    marginLeft: 10,
+    marginTop: 60,
+  },
+  sortButtonsContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sortButtons: {
+    width: "90%",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "green",
+    borderRadius: 15,
+    backgroundColor: "#BAC3C3",
+    marginVertical: 10,
+    padding: 12,
   },
 });
