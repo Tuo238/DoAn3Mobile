@@ -40,15 +40,6 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Like"
-        component={LikeScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name={"heart"} size={20} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Cart"
         component={BagScreen}
         options={{

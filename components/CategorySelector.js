@@ -7,6 +7,7 @@ import {
   StatusBar,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -46,7 +47,7 @@ export default function CategorySelector({ navigation }) {
           }
         >
           <View style={styles.icon}>
-            <Ionicons name={"bed"} size={50} />
+            <Image source={require("../assets/icons8-table-70.png")} />
           </View>
           <Text style={styles.miniText}>Table</Text>
         </TouchableOpacity>
@@ -58,7 +59,7 @@ export default function CategorySelector({ navigation }) {
           }
         >
           <View style={styles.icon}>
-            <Ionicons name={"bed"} size={50} />
+            <Image source={require("../assets/icons8-chair-70.png")} />
           </View>
           <Text style={styles.miniText}>Chair</Text>
         </TouchableOpacity>
@@ -70,7 +71,7 @@ export default function CategorySelector({ navigation }) {
           }
         >
           <View style={styles.icon}>
-            <Ionicons name={"bed"} size={50} />
+            <Image source={require("../assets/icons8-lamp-70.png")} />
           </View>
           <Text style={styles.miniText}>Lamp</Text>
         </TouchableOpacity>
@@ -82,7 +83,7 @@ export default function CategorySelector({ navigation }) {
           }
         >
           <View style={styles.icon}>
-            <Ionicons name={"bed"} size={50} />
+            <Image source={require("../assets/icons8-cabinet-70.png")} />
           </View>
           <Text style={styles.miniText}>Cabinet</Text>
         </TouchableOpacity>

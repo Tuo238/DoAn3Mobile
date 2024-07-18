@@ -78,10 +78,10 @@ export default function SignIn({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.googleButton}>
+      {/* <TouchableOpacity style={styles.googleButton}>
         <Ionicons name={"logo-google"} size={27} color="white" />
         <Text style={styles.googleText}>Sign in with Google</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
