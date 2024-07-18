@@ -55,9 +55,12 @@ export default function ProfileScreen({ navigation, route }) {
       {/* Sử dụng View để tạo lưới chứa các nút */}
       <View style={styles.gridContainer}>
         {/* Tạo các nút bằng TouchableOpacity và thêm biểu tượng bằng Image */}
-        {/* Nút Update deliverry */}
 
-        <TouchableOpacity style={styles.gridItem}>
+        {/* Nút Update deliverry */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("UpdateDelivery")}
+          style={styles.gridItem}
+        >
           <Image
             source={require("../assets/update_dilivery.png")}
             style={styles.icon}

@@ -15,6 +15,20 @@ export default function ProductDetails({ route, navigation }) {
   const { item } = route.params;
   const [quantity, setQuantity] = useState(1);
 
+  const addToBag = () => {
+    // Add logic to add the product to the bag here
+    // For example, you can use Firebase to update the user's cart
+    // Ensure to pass necessary data to BagScreen
+    navigation.navigate("BagScreen", {
+      productId: item.id,
+      productName: item.name,
+      productPrice: item.price,
+      productImage:
+        item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : null,
+      quantity: quantity,
+    });
+  };
+
   const incrementQuantity = () => setQuantity(quantity + 1);
   const decrementQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -76,9 +90,13 @@ export default function ProductDetails({ route, navigation }) {
 
       {/* Buy button container */}
       <View style={styles.buyButtonContainer}>
-        <TouchableOpacity style={styles.addToCartButton}>
+        <TouchableOpacity
+          style={styles.addToCartButton}
+          onPress={addToBag} // Handle adding to bag
+        >
           <Ionicons name="bag-add-outline" size={40} color="black" />
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.buyButton}>
           <Text style={styles.buyButtonText}>Buy Now</Text>
         </TouchableOpacity>

@@ -7,6 +7,9 @@ import PurchaseHistoryScreen from "../screens/PurchaseHistoryScreen";
 import PersonalInformationScreen from "../screens/PersonalInformationScreen";
 import UpdateProfile from "../screens/UpdateProfile";
 import SearchScreen from "../screens/SearchScreen";
+import BagScreen from "../screens/BagScreen";
+import UpdateDelivery from "../screens/UpdateDelivery";
+
 const Stack = createNativeStackNavigator();
 
 export function HomeStack() {
@@ -64,6 +67,25 @@ export function HomeStack() {
         component={UpdateProfile}
         options={{
           title: "Update Information",
+          headerStyle: { backgroundColor: "#BAC3C3" },
+        }}
+      />
+
+      <Stack.Screen
+        name="BagScreen"
+        component={BagScreen}
+        initialParams={{ userId: "your_user_id_here" }}
+        options={{
+          title: "",
+          headerStyle: { backgroundColor: "#BAC3C3" },
+        }}
+      />
+
+      <Stack.Screen
+        name="UpdateDelivery"
+        component={UpdateDelivery}
+        options={{
+          title: "",
           headerStyle: { backgroundColor: "#BAC3C3" },
         }}
       />

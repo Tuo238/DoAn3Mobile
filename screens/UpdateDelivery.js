@@ -11,13 +11,12 @@ import { getAuth } from "firebase/auth";
 import { app } from "../src/firebase/Config";
 import { useRoute } from "@react-navigation/native";
 
-export default function UpdateProfile({ navigation }) {
+export default function UpdateDelivery({ navigation }) {
   const db = getFirestore(app);
   const auth = getAuth(app); //tạo firebase
   const [user, setUser] = useState(null); //lưu thông tin
-  const [name, setName] = useState("");
+
   const [address, setAddress] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
   const [email, setEmail] = useState("");
   const route = useRoute(); // Khai báo route
 
@@ -43,19 +42,13 @@ export default function UpdateProfile({ navigation }) {
         const data = docSnapshot.data(); //lấy dl
         setUser({
           id: docSnapshot.id,
-          name: data.name,
           address: data.address,
-          createdAt: data.createdAt
-            ? data.createdAt.toDate().toLocaleString()
-            : "N/A",
           email: data.email,
         });
         //cập nhật tt
-        setName(data.name || "");
+
         setAddress(data.address || "");
-        setCreatedAt(
-          data.createdAt ? data.createdAt.toDate().toLocaleString() : "N/A"
-        );
+
         setEmail(data.email || "");
       } else {
         console.log("No such document!");
@@ -70,7 +63,6 @@ export default function UpdateProfile({ navigation }) {
       try {
         const userDoc = doc(db, "users", user.id);
         await updateDoc(userDoc, {
-          name,
           address,
           email,
         });
@@ -95,18 +87,19 @@ export default function UpdateProfile({ navigation }) {
         <View style={styles.item1}>
           <TextInput
             style={styles.nd}
-            value={name}
-            onChangeText={setName}
-            placeholder="Name"
+            value={address}
+            onChangeText={setAddress}
+            placeholder="Address"
           />
         </View>
 
-        <View style={styles.item4}>
-          <Text style={styles.nd}>{user.createdAt}</Text>
-        </View>
-
-        <View style={styles.item5}>
-          <Text style={styles.nd}>{user.email}</Text>
+        <View style={styles.item2}>
+          <TextInput
+            style={styles.nd}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="email"
+          />
         </View>
       </View>
     );
@@ -115,8 +108,8 @@ export default function UpdateProfile({ navigation }) {
   return (
     <View style={styles.BC}>
       <View style={styles.container}>
-        <Text style={styles.maintitle}>UPDATE USER</Text>
-        <Text style={styles.maintitle}>INFORMATION</Text>
+        <Text style={styles.maintitle}>UPDATE DELIVERY</Text>
+        <Text style={styles.maintitle}>ADDRESS</Text>
         {renderUser()}
 
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
@@ -157,21 +150,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 40,
   },
-  item3: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item4: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item5: {
+  item2: {
     marginBottom: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,

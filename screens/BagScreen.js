@@ -1,115 +1,114 @@
 import React, { useState, useEffect } from "react";
-
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   FlatList,
-  StatusBar,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  query,
+  getDocs,
+  collection,
+} from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
 
-export default function LikeScreen({ navigation, route }) {
+export default function BagScreen({ navigation }) {
   const db = getFirestore(app);
   const storage = getStorage(app);
-  const [products, setProducts] = useState([]);
+  const [data, setData] = useState([]);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  // Lưu thông tin sản phẩm
+  const [saveProduct, setSaveProduct] = useState({});
 
   useEffect(() => {
-    getBagList();
+    const fetchBag = async () => {
+      try {
+        const q = query(collection(db, "bag"));
+        const querySnapshot = await getDocs(q);
+        const orders = [];
+
+        querySnapshot.forEach((doc) => {
+          if (doc.exists()) {
+            orders.push({ id: doc.id, ...doc.data() });
+          } else {
+            console.log("Document does not exist");
+          }
+        });
+
+        setData(orders); // Sửa từ bag thành orders
+      } catch (error) {
+        console.error("Error fetching bag:", error);
+      }
+    };
+
+    fetchBag();
   }, []);
 
-  const getBagList = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "products"));
-      const productsList = await Promise.all(
-        querySnapshot.docs.map(async (doc) => {
-          const data = doc.data();
-          // console.log(`Product: ${data.name}, Image paths: ${data.images}`); // Debug log
+  // Fetch product images based on product IDs
+  useEffect(() => {
+    const fetchSaveProduct = async () => {
+      const newSaveProduct = {};
+      for (const item of data) {
+        for (const product of item.product_ids) {
+          const productId = product.product_id;
+          if (!newSaveProduct[productId]) {
+            const productDoc = await getDoc(doc(db, "products", productId));
+            if (productDoc.exists()) {
+              newSaveProduct[productId] = productDoc.data().image[0]; // Chỉ lấy hình ảnh đầu tiên
+            }
+          }
+        }
+      }
+      setSaveProduct(newSaveProduct);
+    };
 
-          const imageUrls = await Promise.all(
-            (data.image || []).map(async (imagePath) => {
-              try {
-                const storageRef = ref(storage, imagePath);
-                const url = await getDownloadURL(storageRef);
-                // console.log(`Fetched URL: ${url}`); // Debug log
-                return url;
-              } catch (error) {
-                console.error(`Error fetching URL for ${imagePath}:`, error);
-                return null;
-              }
-            })
-          );
-
-          // console.log(`Product: ${data.name}, Image URLs: ${imageUrls}`); // Debug log
-          return {
-            id: doc.id,
-            ...data,
-            imageUrls: imageUrls.filter((url) => url !== null), // Filter out null URLs
-          };
-        })
-      );
-      setProducts(productsList);
-    } catch (error) {
-      console.error("Error fetching products: ", error);
+    if (data.length > 0) {
+      fetchSaveProduct();
     }
-  };
-
-  const renderItem = ({ item }) => {
-    const imageUrl =
-      item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : null;
-    return (
-      <TouchableOpacity>
-        <View style={styles.item}>
-          <View style={styles.imageContainer}>
-            {imageUrl ? (
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.placeholderImage}>
-                <Text>No Image</Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.innerItem}>
-            <Text style={styles.title}>{item.name}</Text>
-            <Text style={styles.price}>₫ {item.price}</Text>
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name={"remove-circle-outline"}
-                size={30}
-                color="black"
-              />
-              <Text style={styles.quantity}>4.7</Text>
-              <Ionicons name={"add-circle-outline"} size={30} color="black" />
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  }, [data]);
 
   return (
-    <View style={styles.BQ}>
-      <View style={styles.container}>
-        <Text style={styles.maintitle}>My Bag</Text>
-        <FlatList
-          data={products}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          numColumns={1}
-        />
-      </View>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>My Bag</Text>
+
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.listItem}>
+            {item.product_ids.map((product, index) => (
+              <View key={index} style={styles.productRow}>
+                {/* Hiển thị hình ảnh sản phẩm */}
+                <Image
+                  source={{ uri: saveProduct[product.product_id] }}
+                  style={styles.productImage}
+                />
+                <View style={styles.productDetails}>
+                  {/* Hiển thị ID của sản phẩm */}
+                  <Text style={styles.productId}>Name: {product.name}</Text>
+                  {/* Hiển thị số lượng sản phẩm */}
+                  <Text style={styles.productQuantity}>
+                    Quantity: {product.quantity}
+                  </Text>
+                </View>
+              </View>
+            ))}
+            {/* Hiển thị tổng giá */}
+            <Text style={styles.price}>
+              Total: <Text style={styles.priceValue}>{item.total}</Text>
+            </Text>
+          </View>
+        )}
+      />
 
       <TouchableOpacity
         style={styles.buttonContainer}
@@ -117,106 +116,70 @@ export default function LikeScreen({ navigation, route }) {
       >
         <Text style={styles.buttonText}>PAY</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  BQ: {
-    flex: 1,
-    backgroundColor: "#BAC3C3",
-  },
   container: {
-    flex: 1, // Ensure the container takes up the full available height
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  list: {
     flex: 1,
-  },
-  listContent: {
-    paddingBottom: 20, // Optional: add padding to the bottom of the list
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  quantity: {
-    fontSize: 19,
-    marginLeft: 5,
-    marginRight: 5,
-    fontWeight: "bold",
-  },
-  maintitle: {
-    fontSize: 30,
-    color: "black",
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: 30,
-    marginBottom: 20,
-  },
-  item: {
     backgroundColor: "#fff",
-    padding: 10,
-    marginVertical: 8,
-    marginHorizontal: 5,
-    width: 300,
-    borderRadius: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  imageContainer: {
-    marginRight: 50,
-  },
-  innerItem: {
-    flex: 1,
-    justifyContent: "center",
-    flexDirection: "column", // Stack elements vertically
   },
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  price: {
-    fontSize: 16,
-    color: "#333",
-    marginVertical: 5,
-    fontWeight: "bold",
-  },
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
-  },
-  placeholderImage: {
-    width: 100,
-    height: 100,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  buttonContainer: {
-    justifyContent: "center",
-    backgroundColor: "#AABB5D",
-    paddingVertical: 12,
-    paddingHorizontal: 70,
-    borderRadius: 30,
-    position: "absolute",
-    alignSelf: "center",
-    bottom: 50,
-  },
-  buttonText: {
-    fontSize: 25,
-    color: "#fff",
+    fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
+    marginTop: 20,
+  },
+  listItem: {
+    padding: 10,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 5,
+    elevation: 2,
+  },
+  productRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  productImage: {
+    width: 80,
+    height: 80,
+    marginRight: 10,
+  },
+  productDetails: {
+    flex: 1,
+  },
+  productId: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  productQuantity: {
+    fontSize: 14,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginTop: 5,
+  },
+  priceValue: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#ff4081",
+  },
+  buttonContainer: {
+    backgroundColor: "#ff4081",
+    paddingVertical: 15,
+    marginTop: 20,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
