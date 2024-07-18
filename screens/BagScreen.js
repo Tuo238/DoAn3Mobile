@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,105 +7,274 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  Alert,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
+  updateDoc,
   query,
   getDocs,
   collection,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { app } from "../src/firebase/Config";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function BagScreen({ navigation }) {
+export default function BagScreen({ route, navigation }) {
   const db = getFirestore(app);
-  const storage = getStorage(app);
   const [data, setData] = useState([]);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  // Lưu thông tin sản phẩm
   const [saveProduct, setSaveProduct] = useState({});
+  const [quantities, setQuantities] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const bagId = "HiejJHSzPTaPKCJW1pCQ"; // Sử dụng ID tài liệu giỏ hàng đúng cách
+
+  const fetchBag = useCallback(async () => {
+    try {
+      const q = query(collection(db, "bag"));
+      const querySnapshot = await getDocs(q);
+      const orders = [];
+
+      querySnapshot.forEach((doc) => {
+        if (doc.exists()) {
+          orders.push({ id: doc.id, ...doc.data() });
+        } else {
+          console.log("Document does not exist");
+        }
+      });
+
+      setData(orders);
+    } catch (error) {
+      console.error("Error fetching bag:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [db]);
 
   useEffect(() => {
-    const fetchBag = async () => {
-      try {
-        const q = query(collection(db, "bag"));
-        const querySnapshot = await getDocs(q);
-        const orders = [];
-
-        querySnapshot.forEach((doc) => {
-          if (doc.exists()) {
-            orders.push({ id: doc.id, ...doc.data() });
-          } else {
-            console.log("Document does not exist");
-          }
-        });
-
-        setData(orders); // Sửa từ bag thành orders
-      } catch (error) {
-        console.error("Error fetching bag:", error);
-      }
-    };
-
     fetchBag();
-  }, []);
+  }, [fetchBag]);
 
-  // Fetch product images based on product IDs
   useEffect(() => {
     const fetchSaveProduct = async () => {
       const newSaveProduct = {};
+      const newQuantities = {};
       for (const item of data) {
         for (const product of item.product_ids) {
           const productId = product.product_id;
           if (!newSaveProduct[productId]) {
             const productDoc = await getDoc(doc(db, "products", productId));
             if (productDoc.exists()) {
-              newSaveProduct[productId] = productDoc.data().image[0]; // Chỉ lấy hình ảnh đầu tiên
+              const productData = productDoc.data();
+              newSaveProduct[productId] = {
+                name: productData.name,
+                image: productData.image[0],
+                price: productData.price,
+              };
+              newQuantities[productId] = product.quantity;
             }
           }
         }
       }
       setSaveProduct(newSaveProduct);
+      setQuantities(newQuantities);
     };
 
     if (data.length > 0) {
       fetchSaveProduct();
     }
-  }, [data]);
+  }, [data, db]);
+
+  useEffect(() => {
+    if (route.params) {
+      const { productId, productName, productPrice, productImage, quantity } =
+        route.params;
+      addProductToBag(
+        productId,
+        productName,
+        productPrice,
+        productImage,
+        quantity
+      );
+    }
+  }, [route.params]);
+
+  const addProductToBag = async (
+    productId,
+    productName,
+    productPrice,
+    productImage,
+    quantity
+  ) => {
+    try {
+      const bagRef = doc(db, "bag", bagId);
+      const bagDoc = await getDoc(bagRef);
+
+      if (!bagDoc.exists()) {
+        // Create the bag document if it does not exist
+        await setDoc(bagRef, {
+          product_ids: [{ product_id: productId, quantity }],
+        });
+      } else {
+        // Update the bag document if it exists
+        await updateDoc(bagRef, {
+          product_ids: arrayUnion({ product_id: productId, quantity }),
+        });
+      }
+
+      fetchBag(); // Refresh the bag data after adding the product
+    } catch (error) {
+      console.error("Error adding product to bag:", error);
+      setError(error);
+    }
+  };
+
+  const incrementQuantity = (productId) => {
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [productId]: (prevQuantities[productId] || 0) + 1,
+    }));
+  };
+
+  const decrementQuantity = (productId) => {
+    setQuantities((prevQuantities) => {
+      const currentQuantity = prevQuantities[productId] || 1;
+      if (currentQuantity > 1) {
+        return {
+          ...prevQuantities,
+          [productId]: currentQuantity - 1,
+        };
+      }
+      return prevQuantities;
+    });
+  };
+
+  const confirmDeleteProduct = (orderId, productId) => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this product?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteProduct(orderId, productId),
+        },
+      ]
+    );
+  };
+
+  const deleteProduct = async (orderId, productId) => {
+    try {
+      const orderRef = doc(db, "bag", orderId);
+      const orderDoc = await getDoc(orderRef);
+      if (orderDoc.exists()) {
+        const orderData = orderDoc.data();
+        const updatedProducts = orderData.product_ids.filter(
+          (product) => product.product_id !== productId
+        );
+
+        await updateDoc(orderRef, {
+          product_ids: updatedProducts,
+        });
+
+        fetchBag(); // Refresh the bag data after deleting the product
+      } else {
+        console.log("Order does not exist");
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Error: {error.message}</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>My Bag</Text>
+      <Text style={styles.title}>My Cart</Text>
 
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
-            {item.product_ids.map((product, index) => (
-              <View key={index} style={styles.productRow}>
-                {/* Hiển thị hình ảnh sản phẩm */}
-                <Image
-                  source={{ uri: saveProduct[product.product_id] }}
-                  style={styles.productImage}
-                />
-                <View style={styles.productDetails}>
-                  {/* Hiển thị ID của sản phẩm */}
-                  <Text style={styles.productId}>Name: {product.name}</Text>
-                  {/* Hiển thị số lượng sản phẩm */}
-                  <Text style={styles.productQuantity}>
-                    Quantity: {product.quantity}
-                  </Text>
+            {item.product_ids.map((product, index) => {
+              const productId = product.product_id;
+              const savedProduct = saveProduct[productId] || {};
+              const productName = savedProduct.name || "Unknown Product";
+              const productImage = savedProduct.image || "";
+              const productPrice = savedProduct.price || 0;
+              const productQuantity =
+                quantities[productId] || product.quantity || 1;
+
+              return (
+                <View key={index} style={styles.productRow}>
+                  <Image
+                    source={{ uri: productImage }}
+                    style={styles.productImage}
+                  />
+                  <View style={styles.productDetails}>
+                    <View style={styles.productInfo}>
+                      <Text style={styles.productName}>
+                        Name: {productName}
+                      </Text>
+                      <View style={styles.quantityContainer}>
+                        <TouchableOpacity
+                          onPress={() => decrementQuantity(productId)}
+                          style={styles.quantityButton}
+                        >
+                          <Ionicons name="remove" size={10} color="black" />
+                        </TouchableOpacity>
+                        <Text style={styles.quantityText}>
+                          {productQuantity}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => incrementQuantity(productId)}
+                          style={styles.quantityButton}
+                        >
+                          <Ionicons name="add" size={10} color="black" />
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={styles.productPrice}>
+                        Price: ${productPrice}
+                      </Text>
+                      <Text style={styles.totalProductPrice}>
+                        Total Price: $
+                        {(productPrice * productQuantity).toFixed(2)}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => confirmDeleteProduct(item.id, productId)}
+                      style={styles.deleteButton}
+                    >
+                      <Ionicons name="trash" size={18} color="red" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
-            {/* Hiển thị tổng giá */}
-            <Text style={styles.price}>
-              Total: <Text style={styles.priceValue}>{item.total}</Text>
-            </Text>
+              );
+            })}
           </View>
         )}
       />
@@ -131,6 +300,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
   },
+  loadingText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 20,
+    color: "red",
+  },
   listItem: {
     padding: 10,
     marginVertical: 5,
@@ -143,31 +323,56 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
+    marginLeft: 10,
+    marginTop: 20,
   },
   productImage: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     marginRight: 10,
+    borderRadius: 10,
   },
   productDetails: {
     flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginLeft: 20,
   },
-  productId: {
+  productInfo: {
+    flex: 1,
+  },
+  productName: {
     fontSize: 14,
     fontWeight: "bold",
   },
-  productQuantity: {
-    fontSize: 14,
+  quantityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+    marginTop: 10,
+    marginBottom: 10,
   },
-  price: {
+  quantityButton: {
+    backgroundColor: "#E0E0E0",
+    padding: 10,
+    borderRadius: 5,
+  },
+  quantityText: {
+    fontSize: 18,
+    marginHorizontal: 10,
+  },
+  productPrice: {
     fontSize: 14,
+    color: "#555",
     fontWeight: "bold",
+  },
+  totalProductPrice: {
+    fontSize: 15,
+    color: "#555",
     marginTop: 5,
-  },
-  priceValue: {
-    fontSize: 14,
     fontWeight: "bold",
-    color: "#ff4081",
+    color: "red",
   },
   buttonContainer: {
     backgroundColor: "#ff4081",
@@ -181,5 +386,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  deleteButton: {
+    backgroundColor: "#E0E0E0",
+    padding: 10,
+    borderRadius: 5,
   },
 });

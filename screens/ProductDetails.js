@@ -16,9 +16,6 @@ export default function ProductDetails({ route, navigation }) {
   const [quantity, setQuantity] = useState(1);
 
   const addToBag = () => {
-    // Add logic to add the product to the bag here
-    // For example, you can use Firebase to update the user's cart
-    // Ensure to pass necessary data to BagScreen
     navigation.navigate("BagScreen", {
       productId: item.id,
       productName: item.name,
@@ -37,7 +34,6 @@ export default function ProductDetails({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Centered Carousel */}
         <View style={styles.carouselContainer}>
           <Carousel
             style={styles.carousel}
@@ -56,7 +52,6 @@ export default function ProductDetails({ route, navigation }) {
           </Carousel>
         </View>
 
-        {/* Product details */}
         <View style={styles.detailsContainer}>
           <View style={styles.flexbtw}>
             <View style={styles.nameElement}>
@@ -88,12 +83,8 @@ export default function ProductDetails({ route, navigation }) {
         </View>
       </ScrollView>
 
-      {/* Buy button container */}
       <View style={styles.buyButtonContainer}>
-        <TouchableOpacity
-          style={styles.addToCartButton}
-          onPress={addToBag} // Handle adding to bag
-        >
+        <TouchableOpacity style={styles.addToCartButton} onPress={addToBag}>
           <Ionicons name="bag-add-outline" size={40} color="black" />
         </TouchableOpacity>
 
@@ -110,7 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
-    paddingBottom: 100, // Adjust as per your design
+    paddingBottom: 100,
   },
   carouselContainer: {
     alignItems: "center",

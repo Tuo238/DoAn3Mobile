@@ -50,7 +50,7 @@ export default function ProfileScreen({ navigation, route }) {
   // Trả về giao diện của thành phần ProfileScreen
   return (
     <View style={styles.container}>
-      <Text style={styles.itemTextWelcome}>Welcome Jenny !</Text>
+      <Text style={styles.itemTextWelcome}>Welcome </Text>
 
       {/* Sử dụng View để tạo lưới chứa các nút */}
       <View style={styles.gridContainer}>
