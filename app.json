@@ -23,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c368bddf-3435-47fd-8429-631be1588ab2"
+      }
+    },
+    "owner": "tuo.bui"
   }
 }

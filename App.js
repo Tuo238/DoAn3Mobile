@@ -15,6 +15,7 @@ import PurchaseHistoryScreen from "./screens/PurchaseHistoryScreen";
 import { HomeStack } from "./navigations/StackApp";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import { ActivityIndicator, View } from "react-native";
+import registerNNPushToken from "native-notify";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -120,6 +121,7 @@ function AppNavigator() {
 }
 
 export default function App() {
+  registerNNPushToken(22539, "b1dYAiw1pXlhTFpBtohH34");
   return (
     <AuthProvider>
       <NavigationContainer>
