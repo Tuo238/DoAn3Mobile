@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { doc, setDoc, getFirestore } from "firebase/firestore";
@@ -21,14 +22,20 @@ export default function SignUpScreen({ navigation }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, settName] = useState("");
+  const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async () => {
+    // Input validation
+    if (!email || !password || !name || !address || !confirmPassword) {
+      Alert.alert("Error", "All fields must be filled.");
+      return;
+    }
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      Alert.alert("Error", "Passwords do not match.");
       return;
     }
 
@@ -54,11 +61,14 @@ export default function SignUpScreen({ navigation }) {
         createdAt: new Date(),
       });
 
-      alert("Verification email sent. Please check your inbox.");
-      navigation.navigate("SignIn");
+      Alert.alert(
+        "Success",
+        "Verification email sent. Please check your inbox."
+      );
+      // navigation.navigate("SignIn");
     } catch (error) {
       console.error("Error signing up:", error);
-      alert("Error signing up. Please try again.");
+      Alert.alert("Error", "Error signing up. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +82,7 @@ export default function SignUpScreen({ navigation }) {
           placeholder="Full name"
           style={styles.InputStyle}
           value={name}
-          onChangeText={settName}
+          onChangeText={setName}
         />
         <TextInput
           style={styles.InputStyle}
