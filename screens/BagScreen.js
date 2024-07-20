@@ -26,19 +26,20 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function BagScreen({ route, navigation }) {
   const db = getFirestore(app);
-  const [data, setData] = useState([]);
-  const [saveProduct, setSaveProduct] = useState({});
+  const [data, setData] = useState([]); //lưu trữ dữ liệu giỏ hàng
+  const [saveProduct, setSaveProduct] = useState({}); //tt sản phẩm
   const [quantities, setQuantities] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const bagId = "HiejJHSzPTaPKCJW1pCQ"; // Sử dụng ID tài liệu giỏ hàng đúng cách
+  const [loading, setLoading] = useState(true); //tải dữ liệu
+  const [error, setError] = useState(null); //xử lý lỗi
+  const bagId = "HiejJHSzPTaPKCJW1pCQ"; // Sử dụng ID tài liệu giỏ hàng
 
   const fetchBag = useCallback(async () => {
     try {
-      const q = query(collection(db, "bag"));
+      const q = query(collection(db, "bag")); //truy xuất vào bag
       const querySnapshot = await getDocs(q);
       const orders = [];
 
+      // Lặp qua các document trong snapshot và đẩy vào mảng orders
       querySnapshot.forEach((doc) => {
         if (doc.exists()) {
           orders.push({ id: doc.id, ...doc.data() });
@@ -47,7 +48,7 @@ export default function BagScreen({ route, navigation }) {
         }
       });
 
-      setData(orders);
+      setData(orders); //cập nhật state data
     } catch (error) {
       console.error("Error fetching bag:", error);
       setError(error);
@@ -56,6 +57,7 @@ export default function BagScreen({ route, navigation }) {
     }
   }, [db]);
 
+  //lấy chi tiết sp dựa vào id
   useEffect(() => {
     fetchBag();
   }, [fetchBag]);
@@ -90,6 +92,7 @@ export default function BagScreen({ route, navigation }) {
     }
   }, [data, db]);
 
+  //kiểm tra route params để thêm sản phẩm vào giỏ hàng
   useEffect(() => {
     if (route.params) {
       const { productId, productName, productPrice, productImage, quantity } =
@@ -104,6 +107,7 @@ export default function BagScreen({ route, navigation }) {
     }
   }, [route.params]);
 
+  // thêm sp vào giỏ hàng
   const addProductToBag = async (
     productId,
     productName,
@@ -116,24 +120,25 @@ export default function BagScreen({ route, navigation }) {
       const bagDoc = await getDoc(bagRef);
 
       if (!bagDoc.exists()) {
-        // Create the bag document if it does not exist
+        // Tạo document giỏ hàng nếu chưa tồn tại
         await setDoc(bagRef, {
           product_ids: [{ product_id: productId, quantity }],
         });
       } else {
-        // Update the bag document if it exists
+        // Cập nhật document giỏ hàng nếu đã tồn tại
         await updateDoc(bagRef, {
           product_ids: arrayUnion({ product_id: productId, quantity }),
         });
       }
 
-      fetchBag(); // Refresh the bag data after adding the product
+      fetchBag(); // Làm mới dữ liệu giỏ hàng sau khi thêm sản phẩm
     } catch (error) {
       console.error("Error adding product to bag:", error);
       setError(error);
     }
   };
 
+  // tăng số lượng sản phẩm
   const incrementQuantity = (productId) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
@@ -141,6 +146,7 @@ export default function BagScreen({ route, navigation }) {
     }));
   };
 
+  // Hàm giảm số lượng sản phẩm
   const decrementQuantity = (productId) => {
     setQuantities((prevQuantities) => {
       const currentQuantity = prevQuantities[productId] || 1;
@@ -153,6 +159,8 @@ export default function BagScreen({ route, navigation }) {
       return prevQuantities;
     });
   };
+
+  // Hàm xác nhận xóa sản phẩm khỏi giỏ hàng
 
   const confirmDeleteProduct = (orderId, productId) => {
     Alert.alert(
@@ -186,7 +194,7 @@ export default function BagScreen({ route, navigation }) {
           product_ids: updatedProducts,
         });
 
-        fetchBag(); // Refresh the bag data after deleting the product
+        fetchBag(); // Làm mới dữ liệu giỏ hàng sau khi xóa sản phẩm
       } else {
         console.log("Order does not exist");
       }

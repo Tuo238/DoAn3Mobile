@@ -87,26 +87,25 @@ export default function UpdateProfile({ navigation }) {
     }
   };
 
+  //render thông tin người dùng
   const renderUser = () => {
     if (!user) return null;
 
     return (
       <View style={styles.itemcontainer}>
-        <View style={styles.item1}>
-          <TextInput
-            style={styles.nd}
-            value={name}
-            onChangeText={setName}
-            placeholder="Name"
-          />
+        <View style={styles.item}>
+          <Text style={styles.element}>Full Name:</Text>
+          <Text style={styles.nd}>{user.name || "N/A"}</Text>
         </View>
 
-        <View style={styles.item4}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Date of Birth:</Text>
           <Text style={styles.nd}>{user.createdAt}</Text>
         </View>
 
-        <View style={styles.item5}>
-          <Text style={styles.nd}>{user.email}</Text>
+        <View style={styles.item}>
+          <Text style={styles.element}>Email:</Text>
+          <Text style={styles.nd}>{user.email || "N/A"}</Text>
         </View>
       </View>
     );
@@ -145,54 +144,43 @@ const styles = StyleSheet.create({
     top: 1,
   },
   itemcontainer: {
-    padding: "auto",
-    marginTop: 20,
-    borderRadius: 8,
     width: "90%",
+    marginTop: 20,
   },
-  item1: {
-    marginBottom: 20,
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    padding: 10,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+    borderRadius: 8,
   },
-  item3: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item4: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item5: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+  element: {
+    fontWeight: "bold",
+    width: 120,
+    paddingLeft: 10,
   },
   nd: {
-    margin: 10,
+    marginLeft: 5,
   },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+    marginTop: 20,
+  },
+
   button: {
     backgroundColor: "#AABB5D",
     width: 150,
     height: 35,
     justifyContent: "center",
-    textAlign: "center",
+    alignItems: "center",
     borderRadius: 10,
   },
   buttonText: {
-    justifyContent: "center",
-    textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
+    color: "#FFFFFF",
   },
 });

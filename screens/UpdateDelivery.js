@@ -84,7 +84,8 @@ export default function UpdateDelivery({ navigation }) {
 
     return (
       <View style={styles.itemcontainer}>
-        <View style={styles.item1}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Address:</Text>
           <TextInput
             style={styles.nd}
             value={address}
@@ -93,7 +94,8 @@ export default function UpdateDelivery({ navigation }) {
           />
         </View>
 
-        <View style={styles.item2}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Email:</Text>
           <TextInput
             style={styles.nd}
             value={email}
@@ -138,40 +140,43 @@ const styles = StyleSheet.create({
     top: 1,
   },
   itemcontainer: {
-    padding: "auto",
-    marginTop: 20,
-    borderRadius: 8,
     width: "90%",
+    marginTop: 20,
   },
-  item1: {
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
+    padding: 10,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+    borderRadius: 8,
   },
-  item2: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+  element: {
+    fontWeight: "bold",
+    width: 120,
+    paddingLeft: 10,
   },
   nd: {
-    margin: 10,
+    marginLeft: 5,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+    marginTop: 20,
   },
   button: {
     backgroundColor: "#AABB5D",
     width: 150,
     height: 35,
     justifyContent: "center",
-    textAlign: "center",
+    alignItems: "center",
     borderRadius: 10,
+    marginTop: 20,
   },
   buttonText: {
-    justifyContent: "center",
-    textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
+    color: "#FFFFFF",
   },
 });

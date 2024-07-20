@@ -4,10 +4,11 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { app } from "../src/firebase/Config";
 import { useRoute } from "@react-navigation/native";
+
 export default function PersonalInformationScreen({ navigation }) {
   const db = getFirestore(app);
   const auth = getAuth(app);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Lưu trữ thông tin người dùng
   const route = useRoute(); // Khai báo route
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function PersonalInformationScreen({ navigation }) {
 
   const getUserById = async (userId) => {
     try {
-      const userDoc = doc(db, "users", userId);
+      const userDoc = doc(db, "users", userId); // Truy xuất vào users
       const docSnapshot = await getDoc(userDoc);
 
       if (docSnapshot.exists()) {
@@ -55,24 +56,29 @@ export default function PersonalInformationScreen({ navigation }) {
     }
   };
 
+  // Render thông tin người dùng
   const renderUser = () => {
     if (!user) return null;
 
     return (
       <View style={styles.itemcontainer}>
-        <View style={styles.item1}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Full Name:</Text>
           <Text style={styles.nd}>{user.name || "N/A"}</Text>
         </View>
 
-        <View style={styles.item3}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Address:</Text>
           <Text style={styles.nd}>{user.address || "N/A"}</Text>
         </View>
 
-        <View style={styles.item4}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Date of Birth:</Text>
           <Text style={styles.nd}>{user.createdAt}</Text>
         </View>
 
-        <View style={styles.item5}>
+        <View style={styles.item}>
+          <Text style={styles.element}>Email:</Text>
           <Text style={styles.nd}>{user.email || "N/A"}</Text>
         </View>
       </View>
@@ -86,12 +92,21 @@ export default function PersonalInformationScreen({ navigation }) {
         <Text style={styles.maintitle}>INFORMATION</Text>
         {renderUser()}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("UpdateProfile", { item: user })}
-        >
-          <Text style={styles.buttonText}>UPDATE</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.buttonBack}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.buttonText}>BACK</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.buttonUpdate}
+            onPress={() => navigation.navigate("UpdateProfile", { item: user })}
+          >
+            <Text style={styles.buttonText}>UPDATE</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -115,54 +130,50 @@ const styles = StyleSheet.create({
     top: 1,
   },
   itemcontainer: {
-    padding: "auto",
-    marginTop: 20,
-    borderRadius: 8,
     width: "90%",
+    marginTop: 20,
   },
-  item1: {
-    marginBottom: 20,
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    padding: 10,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+    borderRadius: 8,
   },
-  item3: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item4: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
-  },
-  item5: {
-    marginBottom: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    width: 300,
-    height: 40,
+  element: {
+    fontWeight: "bold",
+    width: 120,
+    paddingLeft: 10,
   },
   nd: {
-    margin: 10,
+    marginLeft: 5,
   },
-  button: {
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+    marginTop: 20,
+  },
+  buttonBack: {
     backgroundColor: "#AABB5D",
     width: 150,
     height: 35,
     justifyContent: "center",
-    textAlign: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  buttonUpdate: {
+    backgroundColor: "#AABB5D",
+    width: 150,
+    height: 35,
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
   },
   buttonText: {
-    justifyContent: "center",
-    textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
+    color: "#FFFFFF",
   },
 });
